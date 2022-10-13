@@ -22,25 +22,7 @@
 
 typedef HAL_StatusTypeDef (*TIMEBASE_CallbackTypeDef)();
 
-struct TIMEBASE_IntervalStruct {
-    uint32_t interval_us;
-    TIMEBASE_CallbackTypeDef callbacks[TIMEBASE_MAX_CALLBACKS];
-    uint8_t callbacks_lenght;
-};
-
 typedef struct TIMEBASE_IntervalStruct TIMEBASE_IntervalTypeDef;
-
-struct TIMEBASE_HandleStruct {
-    TIM_HandleTypeDef *htim;
-
-    uint32_t repetition_counter;
-
-    uint32_t base_interval_us;
-
-    TIMEBASE_IntervalTypeDef intervals[TIMEBASE_MAX_INTERVALS];
-    uint32_t intervals_flag;
-    uint8_t intervals_lenght;
-};
 
 typedef struct TIMEBASE_HandleStruct TIMEBASE_HandleTypeDef;
 
