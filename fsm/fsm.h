@@ -15,6 +15,31 @@
 
 #define FSM_MAX_EVENTS 32
 
+struct FSM_ConfigStruct {
+    uint8_t state_length;
+    FSM_StateTypeDef *state_table;
+};
+
+struct FSM_HandleStruct {
+    uint32_t current_state;
+
+    uint8_t events_length;
+    uint32_t events_sync;
+    uint32_t events_async;
+
+    FSM_void_function run_callback;
+    FSM_void_function transition_callback;
+
+    FSM_ConfigTypeDef *config;
+};
+
+struct FSM_StateStruct {
+    FSM_event_handler event_handler;
+    FSM_void_function entry;
+    FSM_state_function do_work;
+    FSM_void_function exit;
+};
+
 typedef struct FSM_HandleStruct FSM_HandleTypeDef;
 typedef struct FSM_StateStruct FSM_StateTypeDef;
 typedef struct FSM_ConfigStruct FSM_ConfigTypeDef;

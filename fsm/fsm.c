@@ -2,31 +2,6 @@
 
 #include <string.h>
 
-struct FSM_ConfigStruct {
-    uint8_t state_length;
-    FSM_StateTypeDef *state_table;
-};
-
-struct FSM_HandleStruct {
-    uint32_t current_state;
-
-    uint8_t events_length;
-    uint32_t events_sync;
-    uint32_t events_async;
-
-    FSM_void_function run_callback;
-    FSM_void_function transition_callback;
-
-    FSM_ConfigTypeDef *config;
-};
-
-struct FSM_StateStruct {
-    FSM_event_handler event_handler;
-    FSM_void_function entry;
-    FSM_state_function do_work;
-    FSM_void_function exit;
-};
-
 HAL_StatusTypeDef FSM_init(FSM_HandleTypeDef *handle, FSM_ConfigTypeDef *config, uint8_t event_count, FSM_void_function run_callback, FSM_void_function transition_callback) {
     if(handle == NULL) {
         return HAL_ERROR;
