@@ -1,0 +1,8 @@
+digraph {
+	START -> START
+    START -> SETUP
+    SETUP -> RUN
+    RUN -> RUN
+    RUN -> ERROR
+    ERROR -> ERROR
+}

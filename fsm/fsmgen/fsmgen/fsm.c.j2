@@ -1,0 +1,96 @@
+/*
+ * "THE BEER-WARE LICENSE" (Revision 69):
+ * Squadra Corse firmware team wrote this file. As long as you retain this notice
+ * you can do whatever you want with this stuff. If we meet some day, and you
+ * think this stuff is worth it, you can buy us a beer in return.
+ *
+ * Authors
+ * - Filippo Rossi <filippo.rossi.sc@gmail.com>
+ * - Federico Carbone <federico.carbone.sc@gmail.com>
+ */
+
+#include "{{ name }}.h"
+
+#ifndef __weak
+#define __weak __attribute__((weak))
+#endif // __weak
+
+FSM_StateTypeDef state_table[_FSM_{{ name | upper }}_STATE_COUNT] = {
+{%- for state in states %}
+    [FSM_{{ name | upper }}_{{ state }}] = {
+        .event_handler = _FSM_{{ name | upper }}_{{ state }}_event_handle,
+        .entry = FSM_{{ name | upper }}_{{ state }}_entry,
+        .do_work = _FSM_{{ name | upper }}_{{ state }}_do_work,
+        .exit = FSM_{{ name | upper }}_{{ state }}_exit,
+    },
+{%- endfor %}
+};
+
+FSM_ConfigTypeDef config = {
+    .state_length = _FSM_{{ name | upper }}_STATE_COUNT,
+    .state_table = &state_table,
+};
+
+HAL_StatusTypeDef FSM_{{ name | upper }}_init(
+    FSM_HandleTypeDef *handle,
+    uint8_t event_count,
+    FSM_void_function run_callback,
+    FSM_void_function transition_callback
+) {
+    return FSM_init(handle, &config, event_count, run_callback, transition_callback);
+}
+
+// State control functions
+{% for state in states %}
+/** @brief wrapper of FSM_{{ name | upper }}_event_handle, with exit state checking */
+FSM_{{ name | upper }}_StateTypeDef _FSM_{{ name | upper }}_{{ state }}_event_handle(FSM_HandleTypeDef *handle, uint8_t event) {
+    FSM_{{ name | upper }}_StateTypeDef next = FSM_{{ name | upper }}_event_handle(handle, event);
+
+    switch (next) {
+    {%- for _, to in out_edges[state] %}
+    case FSM_{{ name | upper }}_{{ to }}:
+    {%- endfor %}
+        return next;
+    default:
+        return _FSM_{{ name | upper }}_DIE;
+    }
+}
+
+/** @brief wrapper of FSM_{{ name | upper }}_do_work, with exit state checking */
+FSM_{{ name | upper }}_StateTypeDef _FSM_{{ name | upper }}_{{ state }}_do_work(FSM_HandleTypeDef *handle) {
+    FSM_{{ name | upper }}_StateTypeDef next = FSM_{{ name | upper }}_do_work(handle);
+
+    switch (next) {
+    {%- for _, to in out_edges[state] %}
+    case FSM_{{ name | upper }}_{{ to }}:
+    {%- endfor %}
+        return next;
+    default:
+        return _FSM_{{ name | upper }}_DIE;
+    }
+}
+{% endfor %}
+
+// State functions
+{% for state in states %}
+/** @attention this function is a stub and as such is declared as weak. */
+__weak FSM_{{ name | upper }}_StateTypeDef FSM_{{ name | upper }}_{{ state }}_event_handle(FSM_HandleTypeDef *handle, uint8_t event) {
+    return _FSM_{{ name | upper }}_DIE;
+}
+
+/** @attention this function is a stub and as such is declared as weak. */
+__weak void FSM_{{ name | upper }}_{{ state }}_entry(FSM_HandleTypeDef *handle) {
+    return;
+}
+
+/** @attention this function is a stub and as such is declared as weak. */
+__weak FSM_{{ name | upper }}_StateTypeDef FSM_{{ name | upper }}_{{ state }}_do_work(FSM_HandleTypeDef *handle) {
+    return _FSM_{{ name | upper }}_DIE;
+}
+
+/** @attention this function is a stub and as such is declared as weak. */
+__weak void FSM_{{ name | upper }}_{{ state }}_exit(FSM_HandleTypeDef *handle) {
+    return;
+}
+{% endfor %}
+

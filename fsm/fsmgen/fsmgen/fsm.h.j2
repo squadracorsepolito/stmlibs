@@ -1,0 +1,75 @@
+/*
+ * "THE BEER-WARE LICENSE" (Revision 69):
+ * Squadra Corse firmware team wrote this file. As long as you retain this notice
+ * you can do whatever you want with this stuff. If we meet some day, and you
+ * think this stuff is worth it, you can buy us a beer in return.
+ *
+ * Authors
+ * - Filippo Rossi <filippo.rossi.sc@gmail.com>
+ * - Federico Carbone <federico.carbone.sc@gmail.com>
+ */
+
+#ifndef FSM_{{ name | upper }}_H
+#define FSM_{{ name | upper }}_H
+
+#include "fsm.h"
+
+enum FSM_{{ name | upper }}_StateEnum {
+{%- for state in states %}
+    FSM_{{ name | upper }}_{{ state }} = {{ loop.index - 1 }},
+{%- endfor %}
+
+    _FSM_{{ name | upper }}_STATE_COUNT = {{ states | length }},
+
+    /** @brief Invalid state, leads to irrecoverable error i.e. hard fault */
+    _FSM_{{ name | upper }}_DIE = {{ states | length + 1 }}
+};
+
+typedef enum FSM_{{ name | upper }}_StateEnum FSM_{{ name | upper }}_StateTypeDef;
+
+/**
+ * @brief
+ * @param handle FSM handle
+ * @param event_count number of events
+ * @param run_callback callback of a run event
+ * @param transition_callback callback of a transition event
+ * @return status
+ */
+HAL_StatusTypeDef FSM_{{ name | upper }}_init(
+    FSM_HandleTypeDef *handle,
+    uint8_t event_count,
+    FSM_void_function run_callback,
+    FSM_void_function transition_callback
+);
+
+// State functions
+{% for state in states %}
+/**
+ * @brief
+ * @param handle FSM handle
+ * @param event event
+ * @return next state
+ */
+FSM_{{ name | upper }}_StateTypeDef FSM_{{ name | upper }}_{{ state }}_event_handle(FSM_HandleTypeDef *handle, uint8_t event);
+
+/**
+ * @brief
+ * @param handle FSM handle
+ */
+void FSM_{{ name | upper }}_{{ state }}_entry(FSM_HandleTypeDef *handle);
+
+/**
+ * @brief
+ * @param handle FSM handle
+ * @return next state
+ */
+FSM_{{ name | upper }}_StateTypeDef FSM_{{ name | upper }}_{{ state }}_do_work(FSM_HandleTypeDef *handle);
+
+/**
+ * @brief
+ * @param handle FSM handle
+ */
+void FSM_{{ name | upper }}_{{ state }}_exit(FSM_HandleTypeDef *handle);
+{% endfor %}
+
+#endif // FSM_{{ name | upper }}_H
