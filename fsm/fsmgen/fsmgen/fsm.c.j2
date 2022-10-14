@@ -75,7 +75,7 @@ FSM_{{ name | upper }}_StateTypeDef _FSM_{{ name | upper }}_{{ state }}_do_work(
 {% for state in states %}
 /** @attention this function is a stub and as such is declared as weak. */
 __weak FSM_{{ name | upper }}_StateTypeDef FSM_{{ name | upper }}_{{ state }}_event_handle(FSM_HandleTypeDef *handle, uint8_t event) {
-    return _FSM_{{ name | upper }}_DIE;
+    return FSM_{{ name | upper }}_{{ state }};
 }
 
 /** @attention this function is a stub and as such is declared as weak. */
@@ -85,7 +85,7 @@ __weak void FSM_{{ name | upper }}_{{ state }}_entry(FSM_HandleTypeDef *handle) 
 
 /** @attention this function is a stub and as such is declared as weak. */
 __weak FSM_{{ name | upper }}_StateTypeDef FSM_{{ name | upper }}_{{ state }}_do_work(FSM_HandleTypeDef *handle) {
-    return _FSM_{{ name | upper }}_DIE;
+    return FSM_{{ name | upper }}_{{ state }};
 }
 
 /** @attention this function is a stub and as such is declared as weak. */
