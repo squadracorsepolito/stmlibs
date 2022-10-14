@@ -47,8 +47,11 @@ FSM_{{ name | upper }}_StateTypeDef _FSM_{{ name | upper }}_{{ state }}_event_ha
     FSM_{{ name | upper }}_StateTypeDef next = FSM_{{ name | upper }}_event_handle(handle, event);
 
     switch (next) {
-    {%- for _, to in out_edges[state] %}
-    case FSM_{{ name | upper }}_{{ to }}:
+    {%- if state not in exits[state] %}
+    case FSM_{{ name | upper }}_{{ state }}: // Reentrance is always supported on event handlers
+    {%- endif %}
+    {%- for exit in exits[state] %}
+    case FSM_{{ name | upper }}_{{ exit }}:
     {%- endfor %}
         return next;
     default:
@@ -61,8 +64,8 @@ FSM_{{ name | upper }}_StateTypeDef _FSM_{{ name | upper }}_{{ state }}_do_work(
     FSM_{{ name | upper }}_StateTypeDef next = FSM_{{ name | upper }}_do_work(handle);
 
     switch (next) {
-    {%- for _, to in out_edges[state] %}
-    case FSM_{{ name | upper }}_{{ to }}:
+    {%- for exit in exits[state] %}
+    case FSM_{{ name | upper }}_{{ exit }}:
     {%- endfor %}
         return next;
     default:

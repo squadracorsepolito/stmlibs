@@ -31,12 +31,12 @@ def main(name: str, dot: TextIOWrapper):
     G = nx.MultiDiGraph(G)  # Cast to MultiDiGraph to allow parallel edges
 
     states = [state for state in G.nodes]
-    out_edges = {state: G.out_edges(state) for state in states}
+    exits = {state: [N for _, N in G.out_edges(state)] for state in states}
 
     args = {
         "name": name,
         "states": states,
-        "out_edges": out_edges,
+        "exits": exits,
     }
 
     cwd = Path.cwd()
