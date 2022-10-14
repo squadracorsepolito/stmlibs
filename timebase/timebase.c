@@ -30,6 +30,10 @@ struct TIMEBASE_HandleStruct {
 };
 
 HAL_StatusTypeDef TIMEBASE_init(TIMEBASE_HandleTypeDef *handle, TIM_HandleTypeDef *htim, uint32_t base_interval_us) {
+    if(handle == NULL || htim == NULL) {
+        return HAL_ERROR;
+    }
+
     handle->htim = htim;
     handle->base_interval_us = base_interval_us;
 
@@ -48,6 +52,10 @@ HAL_StatusTypeDef TIMEBASE_init(TIMEBASE_HandleTypeDef *handle, TIM_HandleTypeDe
 }
 
 HAL_StatusTypeDef TIMEBASE_add_interval(TIMEBASE_HandleTypeDef *handle, uint32_t interval_us, uint8_t *interval_index) {
+    if(handle == NULL) {
+        return HAL_ERROR;
+    }
+
     if(interval_us % handle->base_interval_us != 0) {
         return HAL_ERROR;
     }
@@ -73,9 +81,17 @@ HAL_StatusTypeDef TIMEBASE_add_interval(TIMEBASE_HandleTypeDef *handle, uint32_t
 }
 
 HAL_StatusTypeDef TIMEBASE_register_callback(TIMEBASE_HandleTypeDef *handle, uint8_t interval_index, TIMEBASE_CallbackTypeDef callback) {
+    if(handle == NULL) {
+        return HAL_ERROR;
+    }
+
     TIMEBASE_IntervalTypeDef *interval = &handle->intervals[interval_index];
 
     if(interval->callbacks_lenght == TIMEBASE_MAX_CALLBACKS) {
+        return HAL_ERROR;
+    }
+
+    if(callback == NULL) {
         return HAL_ERROR;
     }
 
@@ -87,6 +103,10 @@ HAL_StatusTypeDef TIMEBASE_register_callback(TIMEBASE_HandleTypeDef *handle, uin
 }
 
 HAL_StatusTypeDef TIMEBASE_routine(TIMEBASE_HandleTypeDef *handle) {
+    if(handle == NULL) {
+        return HAL_ERROR;
+    }
+    
     for(uint8_t i=0; i<handle->intervals_lenght; ++i) {
         if(!(handle->intervals_flag & (1 << i)))
             continue;
