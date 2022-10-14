@@ -19,9 +19,13 @@ typedef struct FSM_HandleStruct FSM_HandleTypeDef;
 typedef struct FSM_StateStruct FSM_StateTypeDef;
 typedef struct FSM_ConfigStruct FSM_ConfigTypeDef;
 
-typedef uint8_t (*FSM_state_function)(FSM_HandleTypeDef handle);
-typedef uint8_t (*FSM_event_handler)(FSM_HandleTypeDef handle, uint8_t event);
+typedef void (*FSM_void_function)(FSM_HandleTypeDef *handle);
+typedef uint32_t (*FSM_state_function)(FSM_HandleTypeDef *handle);
+typedef uint32_t (*FSM_event_handler)(FSM_HandleTypeDef *handle, uint8_t event);
 
-HAL_StatusTypeDef FSM_init(FSM_HandleTypeDef *handle, FSM_ConfigTypeDef *config, uint8_t event_count, FSM_state_function run_callback, FSM_state_function transition_callback);
-
+HAL_StatusTypeDef FSM_init(FSM_HandleTypeDef *handle, FSM_ConfigTypeDef *config, uint8_t event_count, FSM_void_function run_callback, FSM_void_function transition_callback);
+HAL_StatusTypeDef FSM_start(FSM_HandleTypeDef *handle);
+uint32_t FSM_get_state(FSM_HandleTypeDef *handle);
+HAL_StatusTypeDef FSM_trigger_event(FSM_HandleTypeDef *handle, uint8_t event);
+HAL_StatusTypeDef FSM_run(FSM_HandleTypeDef *handle);
 #endif //FSM_H
