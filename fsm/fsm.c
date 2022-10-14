@@ -23,7 +23,7 @@ HAL_StatusTypeDef FSM_init(FSM_HandleTypeDef *handle, FSM_ConfigTypeDef *config,
 
     handle->current_state = 0;
     
-    handle->events_length = 0;
+    handle->events_length = event_count;
     handle->events_sync = 0;
     handle->events_async = 0;
 
@@ -91,7 +91,7 @@ HAL_StatusTypeDef _FSM_transition(FSM_HandleTypeDef *handle, uint32_t state) {
     return HAL_OK;
 }
 
-HAL_StatusTypeDef FSM_run(FSM_HandleTypeDef *handle) {
+HAL_StatusTypeDef FSM_routine(FSM_HandleTypeDef *handle) {
     if(handle == NULL) {
         return HAL_ERROR;
     }
