@@ -12,7 +12,7 @@
 
 #include <string.h>
 
-HAL_StatusTypeDef FSM_init(FSM_HandleTypeDef *handle, FSM_ConfigTypeDef *config, uint8_t event_count, FSM_void_function run_callback, FSM_void_function transition_callback) {
+HAL_StatusTypeDef FSM_init(FSM_HandleTypeDef *handle, FSM_ConfigTypeDef *config, uint8_t event_count, FSM_callback_function run_callback, FSM_callback_function transition_callback) {
     if(handle == NULL) {
         return HAL_ERROR;
     }
@@ -88,6 +88,8 @@ HAL_StatusTypeDef _FSM_transition(FSM_HandleTypeDef *handle, uint32_t state) {
         handle->config->state_table[handle->current_state].entry();
     }
 
+    handle->transition_callback(state);
+
     return HAL_OK;
 }
 
@@ -119,7 +121,7 @@ HAL_StatusTypeDef FSM_routine(FSM_HandleTypeDef *handle) {
     }
 
     if(handle->run_callback != NULL) {
-        handle->run_callback();
+        handle->run_callback(handle->current_state);
     }
 
     return HAL_OK;

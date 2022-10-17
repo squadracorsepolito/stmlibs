@@ -17,6 +17,7 @@
 #define FSM_MAX_EVENTS 32
 
 typedef void (*FSM_void_function)(void);
+typedef void (*FSM_callback_function)(uint32_t state);
 typedef uint32_t (*FSM_state_function)(void);
 typedef uint32_t (*FSM_event_handler)(uint8_t event);
 
@@ -41,8 +42,8 @@ struct FSM_HandleStruct {
     uint32_t events_sync;
     uint32_t events_async;
 
-    FSM_void_function run_callback;
-    FSM_void_function transition_callback;
+    FSM_callback_function run_callback;
+    FSM_callback_function transition_callback;
 
     FSM_ConfigTypeDef *config;
 };
@@ -58,7 +59,7 @@ typedef struct FSM_HandleStruct FSM_HandleTypeDef;
  * @param     transition_callback Function to be executen on every transition
  * @return    HAL_OK on success, HAL_ERROR on failure
  */
-HAL_StatusTypeDef FSM_init(FSM_HandleTypeDef *handle, FSM_ConfigTypeDef *config, uint8_t event_count, FSM_void_function run_callback, FSM_void_function transition_callback);
+HAL_StatusTypeDef FSM_init(FSM_HandleTypeDef *handle, FSM_ConfigTypeDef *config, uint8_t event_count, FSM_callback_function run_callback, FSM_callback_function transition_callback);
 /**
  * @brief     Runs the entry function of the FSM_HandleTypeDef structure 
  * 
