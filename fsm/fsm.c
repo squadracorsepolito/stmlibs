@@ -41,7 +41,7 @@ HAL_StatusTypeDef FSM_start(FSM_HandleTypeDef *handle) {
     }
 
     if(handle->config->state_length > 0 && handle->config->state_table[0].entry != NULL) {
-        handle->config->state_table[0].entry(handle);
+        handle->config->state_table[0].entry();
     }
 
     return HAL_OK;
@@ -62,7 +62,7 @@ HAL_StatusTypeDef FSM_trigger_event(FSM_HandleTypeDef *handle, uint8_t event) {
         return HAL_ERROR;
     }
 
-    if(!(handle->events_async ^ handle->events_sync) & mask) {
+    if(~(handle->events_async ^ handle->events_sync) & mask) {
         handle->events_async ^= mask;
     }
 
@@ -79,13 +79,13 @@ HAL_StatusTypeDef _FSM_transition(FSM_HandleTypeDef *handle, uint32_t state) {
     }
 
     if(handle->config->state_table[handle->current_state].exit != NULL) {
-        handle->config->state_table[handle->current_state].exit(handle);
+        handle->config->state_table[handle->current_state].exit();
     }
 
     handle->current_state = state;
 
     if(handle->config->state_table[handle->current_state].entry != NULL) {
-        handle->config->state_table[handle->current_state].entry(handle);
+        handle->config->state_table[handle->current_state].entry();
     }
 
     return HAL_OK;
@@ -101,7 +101,7 @@ HAL_StatusTypeDef FSM_routine(FSM_HandleTypeDef *handle) {
             uint32_t mask = 1 << i;
             if((handle->events_async ^ handle->events_sync) & mask) {
                 handle->events_async ^= mask;
-                uint32_t ret = handle->config->state_table[handle->current_state].event_handler(handle, i);
+                uint32_t ret = handle->config->state_table[handle->current_state].event_handler(i);
 
                 if(ret != handle->current_state) {
                     return _FSM_transition(handle, ret);
@@ -111,7 +111,7 @@ HAL_StatusTypeDef FSM_routine(FSM_HandleTypeDef *handle) {
     }
 
     if(handle->config->state_table[handle->current_state].do_work != NULL) {
-        uint32_t ret = handle->config->state_table[handle->current_state].do_work(handle);
+        uint32_t ret = handle->config->state_table[handle->current_state].do_work();
 
         if(ret != handle->current_state) {
             return _FSM_transition(handle, ret);
@@ -119,7 +119,7 @@ HAL_StatusTypeDef FSM_routine(FSM_HandleTypeDef *handle) {
     }
 
     if(handle->run_callback != NULL) {
-        handle->run_callback(handle);
+        handle->run_callback();
     }
 
     return HAL_OK;

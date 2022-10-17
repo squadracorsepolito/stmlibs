@@ -16,9 +16,9 @@
 
 #define FSM_MAX_EVENTS 32
 
-typedef void (*FSM_void_function)(FSM_HandleTypeDef *handle);
-typedef uint32_t (*FSM_state_function)(FSM_HandleTypeDef *handle);
-typedef uint32_t (*FSM_event_handler)(FSM_HandleTypeDef *handle, uint8_t event);
+typedef void (*FSM_void_function)(void);
+typedef uint32_t (*FSM_state_function)(void);
+typedef uint32_t (*FSM_event_handler)(uint8_t event);
 
 struct FSM_StateStruct {
     FSM_event_handler event_handler;
