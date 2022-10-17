@@ -34,8 +34,8 @@ FSM_ConfigTypeDef config = {
 HAL_StatusTypeDef FSM_{{ name | upper }}_init(
     FSM_HandleTypeDef *handle,
     uint8_t event_count,
-    FSM_void_function run_callback,
-    FSM_void_function transition_callback
+    FSM_callback_function run_callback,
+    FSM_callback_function transition_callback
 ) {
     return FSM_init(handle, &config, event_count, run_callback, transition_callback);
 }
@@ -43,8 +43,8 @@ HAL_StatusTypeDef FSM_{{ name | upper }}_init(
 // State control functions
 {% for state in states %}
 /** @brief wrapper of FSM_{{ name | upper }}_event_handle, with exit state checking */
-FSM_{{ name | upper }}_StateTypeDef _FSM_{{ name | upper }}_{{ state }}_event_handle(FSM_HandleTypeDef *handle, uint8_t event) {
-    FSM_{{ name | upper }}_StateTypeDef next = FSM_{{ name | upper }}_event_handle(handle, event);
+FSM_{{ name | upper }}_StateTypeDef _FSM_{{ name | upper }}_{{ state }}_event_handle(uint8_t event) {
+    FSM_{{ name | upper }}_StateTypeDef next = FSM_{{ name | upper }}_event_handle(event);
 
     switch (next) {
     {%- if state not in exits[state] %}
@@ -60,8 +60,8 @@ FSM_{{ name | upper }}_StateTypeDef _FSM_{{ name | upper }}_{{ state }}_event_ha
 }
 
 /** @brief wrapper of FSM_{{ name | upper }}_do_work, with exit state checking */
-FSM_{{ name | upper }}_StateTypeDef _FSM_{{ name | upper }}_{{ state }}_do_work(FSM_HandleTypeDef *handle) {
-    FSM_{{ name | upper }}_StateTypeDef next = FSM_{{ name | upper }}_do_work(handle);
+FSM_{{ name | upper }}_StateTypeDef _FSM_{{ name | upper }}_{{ state }}_do_work() {
+    FSM_{{ name | upper }}_StateTypeDef next = FSM_{{ name | upper }}_do_work();
 
     switch (next) {
     {%- for exit in exits[state] %}
@@ -77,22 +77,22 @@ FSM_{{ name | upper }}_StateTypeDef _FSM_{{ name | upper }}_{{ state }}_do_work(
 // State functions
 {% for state in states %}
 /** @attention this function is a stub and as such is declared as weak. */
-__weak FSM_{{ name | upper }}_StateTypeDef FSM_{{ name | upper }}_{{ state }}_event_handle(FSM_HandleTypeDef *handle, uint8_t event) {
+__weak FSM_{{ name | upper }}_StateTypeDef FSM_{{ name | upper }}_{{ state }}_event_handle(uint8_t event) {
     return FSM_{{ name | upper }}_{{ state }};
 }
 
 /** @attention this function is a stub and as such is declared as weak. */
-__weak void FSM_{{ name | upper }}_{{ state }}_entry(FSM_HandleTypeDef *handle) {
+__weak void FSM_{{ name | upper }}_{{ state }}_entry() {
     return;
 }
 
 /** @attention this function is a stub and as such is declared as weak. */
-__weak FSM_{{ name | upper }}_StateTypeDef FSM_{{ name | upper }}_{{ state }}_do_work(FSM_HandleTypeDef *handle) {
+__weak FSM_{{ name | upper }}_StateTypeDef FSM_{{ name | upper }}_{{ state }}_do_work() {
     return FSM_{{ name | upper }}_{{ state }};
 }
 
 /** @attention this function is a stub and as such is declared as weak. */
-__weak void FSM_{{ name | upper }}_{{ state }}_exit(FSM_HandleTypeDef *handle) {
+__weak void FSM_{{ name | upper }}_{{ state }}_exit() {
     return;
 }
 {% endfor %}

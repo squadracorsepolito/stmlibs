@@ -38,8 +38,8 @@ typedef enum FSM_{{ name | upper }}_StateEnum FSM_{{ name | upper }}_StateTypeDe
 HAL_StatusTypeDef FSM_{{ name | upper }}_init(
     FSM_HandleTypeDef *handle,
     uint8_t event_count,
-    FSM_void_function run_callback,
-    FSM_void_function transition_callback
+    FSM_callback_function run_callback,
+    FSM_callback_function transition_callback
 );
 
 // State functions
@@ -50,26 +50,26 @@ HAL_StatusTypeDef FSM_{{ name | upper }}_init(
  * @param event event
  * @return next state
  */
-FSM_{{ name | upper }}_StateTypeDef FSM_{{ name | upper }}_{{ state }}_event_handle(FSM_HandleTypeDef *handle, uint8_t event);
+FSM_{{ name | upper }}_StateTypeDef FSM_{{ name | upper }}_{{ state }}_event_handle(uint8_t event);
 
 /**
  * @brief
  * @param handle FSM handle
  */
-void FSM_{{ name | upper }}_{{ state }}_entry(FSM_HandleTypeDef *handle);
+void FSM_{{ name | upper }}_{{ state }}_entry();
 
 /**
  * @brief
  * @param handle FSM handle
  * @return next state
  */
-FSM_{{ name | upper }}_StateTypeDef FSM_{{ name | upper }}_{{ state }}_do_work(FSM_HandleTypeDef *handle);
+FSM_{{ name | upper }}_StateTypeDef FSM_{{ name | upper }}_{{ state }}_do_work();
 
 /**
  * @brief
  * @param handle FSM handle
  */
-void FSM_{{ name | upper }}_{{ state }}_exit(FSM_HandleTypeDef *handle);
+void FSM_{{ name | upper }}_{{ state }}_exit();
 {% endfor %}
 
 #endif // FSM_{{ name | upper }}_H
