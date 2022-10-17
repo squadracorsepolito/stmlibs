@@ -11,6 +11,7 @@
 #ifndef FSM_H
 #define FSM_H
 
+#include "main.h"
 #include <inttypes.h>
 
 #define FSM_MAX_EVENTS 32
