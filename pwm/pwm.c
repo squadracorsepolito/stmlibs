@@ -16,12 +16,12 @@ HAL_StatusTypeDef PWM_init(TIM_HandleTypeDef *htim, float period_ms) {
         return HAL_ERROR;
     }
 
-    uint32_t ticks = TIM_MS_TO_TICKS(handle->htim, period_ms);
-    if(ticks > __HAL_TIM_GetAutoreload(handle->htim)) {
+    uint32_t ticks = TIM_MS_TO_TICKS(htim, period_ms);
+    if(ticks > __HAL_TIM_GetAutoreload(htim)) {
         return HAL_ERROR;
     }
 
-    __HAL_TIM_SetAutoreload(handle->htim, ticks);
+    __HAL_TIM_SetAutoreload(htim, ticks);
 
     return HAL_OK;
 }
@@ -47,11 +47,11 @@ HAL_StatusTypeDef PWM_update_duty_cycle(TIM_HandleTypeDef *htim, float duty_cycl
         return HAL_ERROR;
     }
 
-    if(duty_cicle < 0 || duty_cicle > 1) {
+    if(duty_cycle < 0 || duty_cycle > 1) {
         return HAL_ERROR;
     }
     
-    __HAL_TIM_SetCompare(htim, channel, __HAL_TIM_GetAutoreload(htim) * duty_cicle);
+    __HAL_TIM_SetCompare(htim, channel, __HAL_TIM_GetAutoreload(htim) * duty_cycle);
 
     return HAL_OK;
 }
