@@ -84,6 +84,6 @@ HAL_StatusTypeDef TIMEBASE_routine(TIMEBASE_HandleTypeDef *handle);
  * @param     handle Reference to the handle
  * @param     htim Parameter of the HAL_TIM_PeriodElapsedCallback function
  */
-void TIMEBASE_AutoreloadCallback(TIMEBASE_HandleTypeDef *handle, TIM_HandleTypeDef *htim);
+void TIMEBASE_TimerElapsedCallback(TIMEBASE_HandleTypeDef *handle, TIM_HandleTypeDef *htim);
 
 #endif  //TIMEBASE_H

@@ -109,7 +109,7 @@ HAL_StatusTypeDef TIMEBASE_routine(TIMEBASE_HandleTypeDef *handle) {
     return HAL_OK;
 }
 
-void TIMEBASE_AutoreloadCallback(TIMEBASE_HandleTypeDef *handle, TIM_HandleTypeDef *htim) {
+void TIMEBASE_TimerElapsedCallback(TIMEBASE_HandleTypeDef *handle, TIM_HandleTypeDef *htim) {
     if (handle->htim == htim) {
         ++handle->repetition_counter;
         for (uint8_t i = 0; i < handle->intervals_length; ++i) {
