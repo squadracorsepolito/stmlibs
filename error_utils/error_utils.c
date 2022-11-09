@@ -226,14 +226,18 @@ HAL_StatusTypeDef ERROR_UTILS_TimerElapsedCallback(ERROR_UTILS_HandleTypeDef *ha
         uint32_t error_index    = handle->first_to_expire_error_index;
         uint32_t instance_index = handle->first_to_expire_instance_index;
 
-        _ERROR_UTILS_find_first_expiring_and_set_timer(handle);
+        if (handle->config->errors_array[error_index].instances[instance_index].is_triggered) {
+            handle->config->errors_array[error_index].instances[instance_index].is_triggered = 0;
 
-        if (handle->config->errors_array[error_index].toggle_callback != NULL) {
-            handle->config->errors_array[error_index].toggle_callback(error_index, instance_index);
-        }
+            _ERROR_UTILS_find_first_expiring_and_set_timer(handle);
 
-        if (handle->global_toggle_callback != NULL) {
-            handle->global_toggle_callback(error_index, instance_index);
+            if (handle->config->errors_array[error_index].toggle_callback != NULL) {
+                handle->config->errors_array[error_index].toggle_callback(error_index, instance_index);
+            }
+
+            if (handle->global_toggle_callback != NULL) {
+                handle->global_toggle_callback(error_index, instance_index);
+            }
         }
     }
 
