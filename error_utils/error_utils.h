@@ -57,10 +57,14 @@ HAL_StatusTypeDef ERROR_UTILS_error_set(
     ERROR_UTILS_HandleTypeDef *handle,
     uint32_t error_index,
     uint32_t instance_index);
+
 HAL_StatusTypeDef ERROR_UTILS_error_reset(
     ERROR_UTILS_HandleTypeDef *handle,
     uint32_t error_index,
     uint32_t instance_index);
+
 uint8_t ERROR_UTILS_is_set(ERROR_UTILS_HandleTypeDef *handle, uint32_t error_index, uint32_t instance_index);
+
+HAL_StatusTypeDef ERROR_UTILS_TimerElapsedCallback(ERROR_UTILS_HandleTypeDef *handle, TIM_HandleTypeDef *htim);
 
 #endif  //ERROR_UTILS_H

@@ -81,7 +81,6 @@ HAL_StatusTypeDef _ERROR_UTILS_set_timer(ERROR_UTILS_HandleTypeDef *handle, uint
         return HAL_ERROR;
     }
 
-    HAL_TIM_Base_Stop_IT(handle->htim);
     __HAL_TIM_SetCounter(handle->htim, 0);
     __HAL_TIM_SetAutoreload(handle->htim, ticks);
     return HAL_TIM_Base_Start_IT(handle->htim);
@@ -132,6 +131,38 @@ HAL_StatusTypeDef ERROR_UTILS_error_set(
     return HAL_OK;
 }
 
+HAL_StatusTypeDef _ERROR_UTILS_find_first_expiring_and_set_timer(ERROR_UTILS_HandleTypeDef *handle) {
+    if (handle == NULL) {
+        return HAL_ERROR;
+    }
+
+    uint32_t min_error_index    = handle->config->errors_length;
+    uint32_t min_instance_index = 0;
+    uint32_t min_expiry         = UINT32_MAX;
+
+    for (uint32_t i = 0; i < handle->config->errors_length; ++i) {
+        for (uint32_t j = 0; j < handle->config->errors_array[i].instances_length; ++j) {
+            ERROR_UTILS_ErrorInstanceTypeDef *test_inst = &(handle->config->errors_array[i].instances[j]);
+            if (test_inst->is_triggered && _ERROR_UTILS_is_before(test_inst->expected_expiry_ms, min_expiry)) {
+                min_error_index    = i;
+                min_instance_index = j;
+                min_expiry         = test_inst->expected_expiry_ms;
+            }
+        }
+    }
+
+    if (min_error_index != handle->config->errors_length) {
+        _ERROR_UTILS_set_timer(handle, min_expiry);
+
+        handle->first_to_expire_error_index    = min_error_index;
+        handle->first_to_expire_instance_index = min_instance_index;
+    } else {
+        HAL_TIM_Base_Stop_IT(handle->htim);
+    }
+
+    return HAL_OK;
+}
+
 HAL_StatusTypeDef ERROR_UTILS_error_reset(
     ERROR_UTILS_HandleTypeDef *handle,
     uint32_t error_index,
@@ -153,25 +184,7 @@ HAL_StatusTypeDef ERROR_UTILS_error_reset(
     if (instance->is_triggered) {
         instance->is_triggered = 0;
 
-        uint32_t min_error_index = handle->config->errors_length, min_instance_index = 0, min_expiry = UINT32_MAX;
-
-        for (uint32_t i = 0; i < handle->config->errors_length; ++i) {
-            for (uint32_t j = 0; j < handle->config->errors_array[i].instances_length; ++j) {
-                ERROR_UTILS_ErrorInstanceTypeDef *test_inst = &(handle->config->errors_array[i].instances[j]);
-                if (test_inst->is_triggered && _ERROR_UTILS_is_before(test_inst->expected_expiry_ms, min_expiry)) {
-                    min_error_index    = i;
-                    min_instance_index = j;
-                    min_expiry         = test_inst->expected_expiry_ms;
-                }
-            }
-        }
-
-        if (min_error_index != handle->config->errors_length) {
-            _ERROR_UTILS_set_timer(handle, min_expiry);
-
-            handle->first_to_expire_error_index    = min_error_index;
-            handle->first_to_expire_instance_index = min_instance_index;
-        }
+        _ERROR_UTILS_find_first_expiring_and_set_timer(handle);
 
         if (handle->config->errors_array[error_index].toggle_callback != NULL) {
             handle->config->errors_array[error_index].toggle_callback(error_index, instance_index);
@@ -198,4 +211,31 @@ uint8_t ERROR_UTILS_is_set(ERROR_UTILS_HandleTypeDef *handle, uint32_t error_ind
     }
 
     return handle->config->errors_array[error_index].instances[instance_index].is_triggered;
+}
+
+HAL_StatusTypeDef ERROR_UTILS_TimerElapsedCallback(ERROR_UTILS_HandleTypeDef *handle, TIM_HandleTypeDef *htim) {
+    if (handle == NULL) {
+        return HAL_ERROR;
+    }
+
+    if (htim == NULL) {
+        return HAL_ERROR;
+    }
+
+    if (handle->htim == htim) {
+        uint32_t error_index    = handle->first_to_expire_error_index;
+        uint32_t instance_index = handle->first_to_expire_instance_index;
+
+        _ERROR_UTILS_find_first_expiring_and_set_timer(handle);
+
+        if (handle->config->errors_array[error_index].toggle_callback != NULL) {
+            handle->config->errors_array[error_index].toggle_callback(error_index, instance_index);
+        }
+
+        if (handle->global_toggle_callback != NULL) {
+            handle->global_toggle_callback(error_index, instance_index);
+        }
+    }
+
+    return HAL_OK;
 }
