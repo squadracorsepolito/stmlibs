@@ -11,14 +11,14 @@
 #include "timer_utils.h"
 
 uint32_t TIM_GetInternalClkFreq(TIM_HandleTypeDef *htim) {
-  RCC_ClkInitTypeDef clkConfig;
-  uint32_t pFlatency;
-  uint32_t uwTimClock, uwAPBxPrescaler = 0U;
+    RCC_ClkInitTypeDef clkConfig;
+    uint32_t pFlatency;
+    uint32_t uwTimClock, uwAPBxPrescaler = 0U;
 
-  /* Get clock configuration */
-  HAL_RCC_GetClockConfig(&clkConfig, &pFlatency);
+    /* Get clock configuration */
+    HAL_RCC_GetClockConfig(&clkConfig, &pFlatency);
 
-  /* Get APBx prescaler and base clock*/
+    /* Get APBx prescaler and base clock*/
     if (_M_GET_TIM_APB_PLACEMENT(htim)) {
         uwAPBxPrescaler = clkConfig.APB1CLKDivider;
         uwTimClock      = HAL_RCC_GetPCLK1Freq();

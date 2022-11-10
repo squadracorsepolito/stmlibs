@@ -18,7 +18,7 @@
 
 #ifndef TIMEBASE_MAX_CALLBACKS
 #define TIMEBASE_MAX_CALLBACKS 16
-#endif //TIMEBASE_MAX_CALLBACKS
+#endif  //TIMEBASE_MAX_CALLBACKS
 
 typedef HAL_StatusTypeDef (*TIMEBASE_CallbackTypeDef)();
 
@@ -67,7 +67,10 @@ HAL_StatusTypeDef TIMEBASE_add_interval(TIMEBASE_HandleTypeDef *handle, uint32_t
  * @param     callback Callback to be registered
  * @return    HAL_OK on success, HAL_ERROR on failure
  */
-HAL_StatusTypeDef TIMEBASE_register_callback(TIMEBASE_HandleTypeDef *handle, uint8_t interval_index, TIMEBASE_CallbackTypeDef callback);
+HAL_StatusTypeDef TIMEBASE_register_callback(
+    TIMEBASE_HandleTypeDef *handle,
+    uint8_t interval_index,
+    TIMEBASE_CallbackTypeDef callback);
 /**
  * @brief     Routine to be called in the main loop which executes the callbacks
  * 
@@ -81,6 +84,6 @@ HAL_StatusTypeDef TIMEBASE_routine(TIMEBASE_HandleTypeDef *handle);
  * @param     handle Reference to the handle
  * @param     htim Parameter of the HAL_TIM_PeriodElapsedCallback function
  */
-void TIMEBASE_AutoreloadCallback(TIMEBASE_HandleTypeDef *handle, TIM_HandleTypeDef *htim);
+void TIMEBASE_TimerElapsedCallback(TIMEBASE_HandleTypeDef *handle, TIM_HandleTypeDef *htim);
 
-#endif //TIMEBASE_H
+#endif  //TIMEBASE_H

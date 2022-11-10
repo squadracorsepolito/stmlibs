@@ -12,6 +12,7 @@
 #define FSM_H
 
 #include "main.h"
+
 #include <inttypes.h>
 
 #define FSM_MAX_EVENTS 32
@@ -59,7 +60,12 @@ typedef struct FSM_HandleStruct FSM_HandleTypeDef;
  * @param     transition_callback Function to be executen on every transition
  * @return    HAL_OK on success, HAL_ERROR on failure
  */
-HAL_StatusTypeDef FSM_init(FSM_HandleTypeDef *handle, FSM_ConfigTypeDef *config, uint8_t event_count, FSM_callback_function run_callback, FSM_callback_function transition_callback);
+HAL_StatusTypeDef FSM_init(
+    FSM_HandleTypeDef *handle,
+    FSM_ConfigTypeDef *config,
+    uint8_t event_count,
+    FSM_callback_function run_callback,
+    FSM_callback_function transition_callback);
 /**
  * @brief     Runs the entry function of the FSM_HandleTypeDef structure 
  * 
@@ -89,4 +95,4 @@ HAL_StatusTypeDef FSM_trigger_event(FSM_HandleTypeDef *handle, uint8_t event);
  * @return    HAL_OK on success, HAL_ERROR on failure
  */
 HAL_StatusTypeDef FSM_routine(FSM_HandleTypeDef *handle);
-#endif //FSM_H
+#endif  //FSM_H

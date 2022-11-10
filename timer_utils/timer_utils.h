@@ -12,6 +12,7 @@
 #define TIMER_UTILS_H
 
 #include "main.h"
+
 #include <inttypes.h>
 
 /**
@@ -28,7 +29,7 @@
  * @param     TIM TIM Handle
  * @return    value of frequency in Hz
  */
-#define TIM_GET_FREQ(TIM)             (uint32_t)(TIM_GetInternalClkFreq((TIM)) / ((TIM)->Instance->PSC + 1))
+#define TIM_GET_FREQ(TIM) (uint32_t)(TIM_GetInternalClkFreq((TIM)) / ((TIM)->Instance->PSC + 1))
 
 /**
  * @brief     Convert milliseconds to ticks for a specified timer
@@ -37,7 +38,7 @@
  * @param     MS Value in milliseconds to convert (float)
  * @return    ticks in uint32_t
  */
-#define TIM_MS_TO_TICKS(TIM, MS)      (uint32_t)(((float)TIM_GET_FREQ((TIM)) * (MS)) / 1000)
+#define TIM_MS_TO_TICKS(TIM, MS) (uint32_t)(((float)TIM_GET_FREQ((TIM)) * (MS)) / 1000)
 
 /**
  * @brief     Convert ticks to milliseconds for a specified timer
@@ -46,7 +47,14 @@
  * @param     TICKS Value in ticks to convert (uint32)
  * @return    milliseconds in float 
  */
-#define TIM_TICKS_TO_MS(TIM, TICKS)   (((float)(TICKS) * 1000) / TIM_GET_FREQ((TIM)))
+#define TIM_TICKS_TO_MS(TIM, TICKS) (((float)(TICKS)*1000) / TIM_GET_FREQ((TIM)))
+/**
+ * @brief     Get timer max autoreload value
+ * 
+ * @param     htim TIM Handle
+ * @return    Autoreload
+ */
+#define TIM_GET_MAX_AUTORELOAD(TIM) (IS_TIM_32B_COUNTER_INSTANCE((TIM)->Instance) ? UINT32_MAX : UINT16_MAX)
 
 /**
  * @brief     Get timer clock

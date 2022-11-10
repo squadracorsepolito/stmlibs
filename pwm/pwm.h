@@ -12,6 +12,7 @@
 #define PWM_H
 
 #include "main.h"
+
 #include <inttypes.h>
 
 /**
@@ -48,4 +49,4 @@ HAL_StatusTypeDef PWM_stop(TIM_HandleTypeDef *htim, uint32_t channel);
  * @return    HAL_OK on success, HAL_ERROR on failure
  */
 HAL_StatusTypeDef PWM_update_duty_cycle(TIM_HandleTypeDef *htim, float duty_cycle, uint32_t channel);
-#endif //PWM_H
+#endif  //PWM_H
