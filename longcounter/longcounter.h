@@ -55,7 +55,8 @@ typedef struct LONGCOUNTER_HandleStruct {
  */
 HAL_StatusTypeDef LONGCOUNTER_init(LONGCOUNTER_HandleTypeDef *handle, TIM_HandleTypeDef *htim);
 /**
- * @brief     Adds an interval to the specified LONGCOUNTER_HandleTypeDef structure
+ * @brief     Gets the LONGCOUNTER_HandleTypeDef resulting counter 
+ *                much like the get_tick() function
  * 
  * @param     handle Reference to the handle
  * @return    long counter value
