@@ -55,6 +55,13 @@
  * @return    Autoreload
  */
 #define TIM_GET_MAX_AUTORELOAD(TIM) (IS_TIM_32B_COUNTER_INSTANCE((TIM)->Instance) ? UINT32_MAX : UINT16_MAX)
+/**
+ * @brief     Get timer length
+ * 
+ * @param     htim TIM Handle
+ * @return    length
+ */
+#define TIM_GET_LENGTH(TIM) (IS_TIM_32B_COUNTER_INSTANCE((TIM)->Instance) ? 32U : 16U)
 
 /**
  * @brief     Get timer clock
