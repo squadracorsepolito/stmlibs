@@ -43,6 +43,7 @@ struct ERROR_UTILS_HandleStruct {
     ERROR_UTILS_CallbackTypeDef global_toggle_callback;
     ERROR_UTILS_CallbackTypeDef global_expiry_callback;
     ERROR_UTILS_ConfigTypeDef *config;
+    uint32_t count;
 };
 typedef struct ERROR_UTILS_HandleStruct ERROR_UTILS_HandleTypeDef;
 
@@ -64,6 +65,8 @@ HAL_StatusTypeDef ERROR_UTILS_error_reset(
     uint32_t instance_index);
 
 uint8_t ERROR_UTILS_is_set(ERROR_UTILS_HandleTypeDef *handle, uint32_t error_index, uint32_t instance_index);
+
+uint32_t ERROR_UTILS_get_count(ERROR_UTILS_HandleTypeDef *handle);
 
 HAL_StatusTypeDef ERROR_UTILS_TimerElapsedCallback(ERROR_UTILS_HandleTypeDef *handle, TIM_HandleTypeDef *htim);
 
