@@ -34,10 +34,9 @@
 #ifndef LONGCOUNTER_H
 #define LONGCOUNTER_H
 
-#include "tim.h"
-#include <stdint.h>
+#include "main.h"
 
-#define LONGCOUNTER_TIM_LENGTH 16
+#include <stdint.h>
 
 typedef uint64_t LONGCOUNTER_Counter_Type;
 // typedef HAL_StatusTypeDef (*LONGCOUNTER_CallbackTypeDef)();
@@ -68,6 +67,6 @@ LONGCOUNTER_Counter_Type LONGCOUNTER_get_counter(LONGCOUNTER_HandleTypeDef *hand
  * 
  * @param     handle Reference to the handle
  */
-void LONGCOUNTER_TIM_OverflowCallback(LONGCOUNTER_HandleTypeDef *handle);
+void LONGCOUNTER_TIM_OverflowCallback(LONGCOUNTER_HandleTypeDef *handle, TIM_HandleTypeDef *htim);
 
-#endif //LONGCOUNTER_H
+#endif  //LONGCOUNTER_H

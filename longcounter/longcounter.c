@@ -6,32 +6,39 @@
  * 
  * Authors
  * - Filippo Volpe [filippovolpe98+dev@gmail.com]
+ * 
+ * Reviewers
+ * - Federico Carbone [federico.carbone.sc@gmail.com]
  */
 
 #include "longcounter.h"
 
+#include "timer_utils.h"
+
 HAL_StatusTypeDef LONGCOUNTER_init(LONGCOUNTER_HandleTypeDef *handle, TIM_HandleTypeDef *htim) {
-    if(handle == NULL || htim == NULL) {
+    if (handle == NULL || htim == NULL) {
         return HAL_ERROR;
     }
-    // TODO: check the timer htim is LONGCOUNTER_TIM_LENGTH bits
 
-    handle->_htim = htim;
+    handle->_htim    = htim;
     handle->_counter = 0;
 
     handle->_htim->Init.CounterMode = TIM_COUNTERMODE_UP;
-    handle->_htim->Init.Period = (uint32_t)((1ul<<LONGCOUNTER_TIM_LENGTH)-1);
-    TIM_Base_SetConfig(handle->_htim->Instance,&handle->_htim->Init);
+    handle->_htim->Init.Period      = TIM_GET_MAX_AUTORELOAD(htim);
+    TIM_Base_SetConfig(handle->_htim->Instance, &handle->_htim->Init);
     HAL_TIM_Base_Start_IT(handle->_htim);
 
     return HAL_OK;
 }
 
-LONGCOUNTER_Counter_Type LONGCOUNTER_get_counter(LONGCOUNTER_HandleTypeDef *handle){
+LONGCOUNTER_Counter_Type LONGCOUNTER_get_counter(LONGCOUNTER_HandleTypeDef *handle) {
     // Compose the counter using the top bits from the long counter and the lower one from TIM
-    return ((handle->_counter)&(~((1ul<<LONGCOUNTER_TIM_LENGTH)-1)))|((handle->_htim->Instance->CNT)&((1ul<<LONGCOUNTER_TIM_LENGTH)-1));
+    return ((handle->_counter) & (~TIM_GET_MAX_AUTORELOAD(handle->_htim))) |
+           (__HAL_TIM_GetCounter(handle->_htim) & TIM_GET_MAX_AUTORELOAD(handle->_htim));
 }
 
-void LONGCOUNTER_TIM_OverflowCallback(LONGCOUNTER_HandleTypeDef *handle){
-    handle->_counter+=(1<<LONGCOUNTER_TIM_LENGTH);
+void LONGCOUNTER_TIM_OverflowCallback(LONGCOUNTER_HandleTypeDef *handle, TIM_HandleTypeDef *htim) {
+    if (htim == handle->_htim) {
+        handle->_counter += (1 << TIM_GET_LENGTH(handle->_htim));
+    }
 }
