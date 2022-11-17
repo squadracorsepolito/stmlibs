@@ -38,11 +38,11 @@
 
 #include <stdint.h>
 
-typedef volatile uint64_t LONGCOUNTER_Counter_Type;
+typedef uint64_t LONGCOUNTER_Counter_Type;
 // typedef HAL_StatusTypeDef (*LONGCOUNTER_CallbackTypeDef)();
 typedef struct LONGCOUNTER_HandleStruct {
     TIM_HandleTypeDef *_htim;
-    LONGCOUNTER_Counter_Type _counter;
+    volatile LONGCOUNTER_Counter_Type _counter;
 } LONGCOUNTER_HandleTypeDef;
 
 /**
