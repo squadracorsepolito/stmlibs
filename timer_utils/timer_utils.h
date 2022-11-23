@@ -29,7 +29,7 @@
  * @param     TIM TIM Handle
  * @return    value of frequency in Hz
  */
-#define TIM_GET_FREQ(TIM) (uint32_t)(TIM_GetInternalClkFreq((TIM)) / ((TIM)->Instance->PSC + 1))
+#define TIM_GET_FREQ(TIM) ((float)TIM_GetInternalClkFreq((TIM)) / ((TIM)->Instance->PSC + 1))
 
 /**
  * @brief     Convert milliseconds to ticks for a specified timer
@@ -38,7 +38,7 @@
  * @param     MS Value in milliseconds to convert (float)
  * @return    ticks in uint32_t
  */
-#define TIM_MS_TO_TICKS(TIM, MS) (uint32_t)(((float)TIM_GET_FREQ((TIM)) * (MS)) / 1000)
+#define TIM_MS_TO_TICKS(TIM, MS) (uint32_t)((TIM_GET_FREQ((TIM)) * (MS)) / 1000)
 
 /**
  * @brief     Convert ticks to milliseconds for a specified timer
