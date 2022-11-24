@@ -31,7 +31,7 @@ HAL_StatusTypeDef ERROR_UTILS_init(
     }
 
     handle->htim                           = htim;
-    handle->first_to_expire_error_index    = 0;
+    handle->first_to_expire_error_index    = config->errors_length;
     handle->first_to_expire_instance_index = 0;
     handle->global_toggle_callback         = global_toggle_callback;
     handle->global_expiry_callback         = global_expiry_callback;
@@ -110,14 +110,17 @@ HAL_StatusTypeDef ERROR_UTILS_error_set(
     }
 
     ERROR_UTILS_ErrorInstanceTypeDef *instance = &(handle->config->errors_array[error_index].instances[instance_index]);
-    ERROR_UTILS_ErrorInstanceTypeDef *first_to_expire_inst =
-        &(handle->config->errors_array[handle->first_to_expire_error_index]
-              .instances[handle->first_to_expire_instance_index]);
+    ERROR_UTILS_ErrorInstanceTypeDef *first_to_expire_inst = NULL;
+
+    if (handle->first_to_expire_error_index < handle->config->errors_length) {
+        first_to_expire_inst = &(handle->config->errors_array[handle->first_to_expire_error_index]
+                                     .instances[handle->first_to_expire_instance_index]);
+    }
 
     if (!instance->is_triggered) {
         instance->expected_expiry_ms = HAL_GetTick() + handle->config->errors_array[error_index].expiry_delay_ms;
 
-        if (!first_to_expire_inst->is_triggered ||
+        if (first_to_expire_inst == NULL || !first_to_expire_inst->is_triggered ||
             _ERROR_UTILS_is_before(instance->expected_expiry_ms, first_to_expire_inst->expected_expiry_ms)) {
             if (_ERROR_UTILS_set_timer(handle, instance->expected_expiry_ms) != HAL_OK) {
                 return HAL_ERROR;
@@ -176,6 +179,7 @@ HAL_StatusTypeDef _ERROR_UTILS_find_first_expiring_and_set_timer(ERROR_UTILS_Han
         handle->first_to_expire_error_index    = min_error_index;
         handle->first_to_expire_instance_index = min_instance_index;
     } else {
+        handle->first_to_expire_error_index = handle->config->errors_length;
         HAL_TIM_Base_Stop_IT(handle->htim);
     }
 
@@ -261,7 +265,8 @@ HAL_StatusTypeDef ERROR_UTILS_TimerElapsedCallback(ERROR_UTILS_HandleTypeDef *ha
         uint32_t error_index    = handle->first_to_expire_error_index;
         uint32_t instance_index = handle->first_to_expire_instance_index;
 
-        if (handle->config->errors_array[error_index].instances[instance_index].is_triggered) {
+        if (error_index < handle->config->errors_length &&
+            handle->config->errors_array[error_index].instances[instance_index].is_triggered) {
             handle->config->errors_array[error_index].instances[instance_index].is_triggered = 0;
 
             if (_ERROR_UTILS_find_first_expiring_and_set_timer(handle) != HAL_OK) {
