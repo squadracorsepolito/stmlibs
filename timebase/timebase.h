@@ -14,13 +14,13 @@
 #include "main.h"
 #include "stdint.h"
 
-#define TIMEBASE_MAX_INTERVALS 32
+#define TIMEBASE_MAX_INTERVALS 31
 
 #ifndef TIMEBASE_MAX_CALLBACKS
 #define TIMEBASE_MAX_CALLBACKS 16
 #endif  //TIMEBASE_MAX_CALLBACKS
 
-typedef HAL_StatusTypeDef (*TIMEBASE_CallbackTypeDef)();
+typedef HAL_StatusTypeDef (*TIMEBASE_CallbackTypeDef)(void);
 
 struct TIMEBASE_IntervalStruct {
     uint32_t interval_us;

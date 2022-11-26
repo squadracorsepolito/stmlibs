@@ -93,6 +93,16 @@ HAL_StatusTypeDef TIMEBASE_routine(TIMEBASE_HandleTypeDef *handle) {
         return HAL_ERROR;
     }
 
+    if (handle->intervals_flag & (1 << handle->intervals_length)) {
+        uint64_t time = (uint64_t)handle->repetition_counter * handle->base_interval_us;
+        for (uint8_t i = 0; i < handle->intervals_length; ++i) {
+            if ((time % handle->intervals[i].interval_us) == 0) {
+                handle->intervals_flag |= (1 << i);
+            }
+        }
+        handle->intervals_flag &= ~(1 << handle->intervals_length);
+    }
+
     for (uint8_t i = 0; i < handle->intervals_length; ++i) {
         if (!(handle->intervals_flag & (1 << i)))
             continue;
@@ -112,10 +122,6 @@ HAL_StatusTypeDef TIMEBASE_routine(TIMEBASE_HandleTypeDef *handle) {
 void TIMEBASE_TimerElapsedCallback(TIMEBASE_HandleTypeDef *handle, TIM_HandleTypeDef *htim) {
     if (handle->htim == htim) {
         ++handle->repetition_counter;
-        for (uint8_t i = 0; i < handle->intervals_length; ++i) {
-            if ((handle->repetition_counter * handle->base_interval_us) % handle->intervals[i].interval_us == 0) {
-                handle->intervals_flag |= (1 << i);
-            }
-        }
+        handle->intervals_flag |= (1 << handle->intervals_length);
     }
 }
