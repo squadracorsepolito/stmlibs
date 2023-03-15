@@ -12,6 +12,7 @@
 #define TIMER_UTILS_H
 
 #include "main.h"
+#include "stmlibs_status.h"
 
 #include <inttypes.h>
 

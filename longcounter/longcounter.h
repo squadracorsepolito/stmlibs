@@ -35,11 +35,12 @@
 #define LONGCOUNTER_H
 
 #include "main.h"
+#include "stmlibs_status.h"
 
-#include <stdint.h>
+#include <inttypes.h>
 
 typedef uint64_t LONGCOUNTER_Counter_Type;
-// typedef HAL_StatusTypeDef (*LONGCOUNTER_CallbackTypeDef)();
+// typedef STMLIBS_StatusTypeDef (*LONGCOUNTER_CallbackTypeDef)();
 typedef struct LONGCOUNTER_HandleStruct {
     TIM_HandleTypeDef *_htim;
     volatile LONGCOUNTER_Counter_Type _counter;
@@ -50,9 +51,9 @@ typedef struct LONGCOUNTER_HandleStruct {
  * 
  * @param     handle Reference to the struct to be initialized
  * @param     htim Reference counter, already initialized
- * @return    HAL_OK on success, HAL_ERROR on failure
+ * @return    STMLIBS_OK on success, STMLIBS_ERROR on failure
  */
-HAL_StatusTypeDef LONGCOUNTER_init(LONGCOUNTER_HandleTypeDef *handle, TIM_HandleTypeDef *htim);
+STMLIBS_StatusTypeDef LONGCOUNTER_init(LONGCOUNTER_HandleTypeDef *handle, TIM_HandleTypeDef *htim);
 /**
  * @brief     Gets the LONGCOUNTER_HandleTypeDef resulting counter 
  *                much like the get_tick() function

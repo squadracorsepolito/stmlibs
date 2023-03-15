@@ -12,7 +12,9 @@
 #define TIMEBASE_H
 
 #include "main.h"
-#include "stdint.h"
+#include "stmlibs_status.h"
+
+#include <stdint.h>
 
 #define TIMEBASE_MAX_INTERVALS 31
 
@@ -20,7 +22,7 @@
 #define TIMEBASE_MAX_CALLBACKS 16
 #endif  //TIMEBASE_MAX_CALLBACKS
 
-typedef HAL_StatusTypeDef (*TIMEBASE_CallbackTypeDef)(void);
+typedef STMLIBS_StatusTypeDef (*TIMEBASE_CallbackTypeDef)(void);
 
 struct TIMEBASE_IntervalStruct {
     uint32_t interval_us;
@@ -47,37 +49,38 @@ typedef struct TIMEBASE_HandleStruct TIMEBASE_HandleTypeDef;
  * 
  * @param     handle Reference to the struct to be initialized
  * @param     base_interval_us Base interval tick expressed in us
- * @return    HAL_OK on success, HAL_ERROR on failure
+ * @return    STMLIBS_OK on success, STMLIBS_ERROR on failure
  */
-HAL_StatusTypeDef TIMEBASE_init(TIMEBASE_HandleTypeDef *handle, TIM_HandleTypeDef *htim, uint32_t base_interval_us);
+STMLIBS_StatusTypeDef TIMEBASE_init(TIMEBASE_HandleTypeDef *handle, TIM_HandleTypeDef *htim, uint32_t base_interval_us);
 /**
  * @brief     Adds an interval to the specified TIMEBASE_HandleTypeDef structure
  * 
  * @param     handle Reference to the handle
  * @param     interval_us Interval to be added expressed in us
  * @param     interval_index Reference to an uint8_t in which the index of the added interval will be stored
- * @return    HAL_OK on success, HAL_ERROR on failure
+ * @return    STMLIBS_OK on success, STMLIBS_ERROR on failure
  */
-HAL_StatusTypeDef TIMEBASE_add_interval(TIMEBASE_HandleTypeDef *handle, uint32_t interval_us, uint8_t *interval_index);
+STMLIBS_StatusTypeDef TIMEBASE_add_interval(TIMEBASE_HandleTypeDef *handle,
+                                            uint32_t interval_us,
+                                            uint8_t *interval_index);
 /**
  * @brief     Register a callback to the specified interval
  * 
  * @param     handle Reference to the handle
  * @param     interval_index Index of the interval returned by @TIMEBASE_add_interval
  * @param     callback Callback to be registered
- * @return    HAL_OK on success, HAL_ERROR on failure
+ * @return    STMLIBS_OK on success, STMLIBS_ERROR on failure
  */
-HAL_StatusTypeDef TIMEBASE_register_callback(
-    TIMEBASE_HandleTypeDef *handle,
-    uint8_t interval_index,
-    TIMEBASE_CallbackTypeDef callback);
+STMLIBS_StatusTypeDef TIMEBASE_register_callback(TIMEBASE_HandleTypeDef *handle,
+                                                 uint8_t interval_index,
+                                                 TIMEBASE_CallbackTypeDef callback);
 /**
  * @brief     Routine to be called in the main loop which executes the callbacks
  * 
  * @param     handle Reference to the handle
- * @return    HAL_OK on success, HAL_ERROR on failure
+ * @return    STMLIBS_OK on success, STMLIBS_ERROR on failure
  */
-HAL_StatusTypeDef TIMEBASE_routine(TIMEBASE_HandleTypeDef *handle);
+STMLIBS_StatusTypeDef TIMEBASE_routine(TIMEBASE_HandleTypeDef *handle);
 /**
  * @brief     Function to be called in the HAL_TIM_PeriodElapsedCallback function
  * 

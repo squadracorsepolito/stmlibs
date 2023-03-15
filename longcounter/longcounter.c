@@ -15,9 +15,9 @@
 
 #include "timer_utils.h"
 
-HAL_StatusTypeDef LONGCOUNTER_init(LONGCOUNTER_HandleTypeDef *handle, TIM_HandleTypeDef *htim) {
+STMLIBS_StatusTypeDef LONGCOUNTER_init(LONGCOUNTER_HandleTypeDef *handle, TIM_HandleTypeDef *htim) {
     if (handle == NULL || htim == NULL) {
-        return HAL_ERROR;
+        return STMLIBS_ERROR;
     }
 
     handle->_htim    = htim;
@@ -28,7 +28,7 @@ HAL_StatusTypeDef LONGCOUNTER_init(LONGCOUNTER_HandleTypeDef *handle, TIM_Handle
     TIM_Base_SetConfig(handle->_htim->Instance, &handle->_htim->Init);
     HAL_TIM_Base_Start_IT(handle->_htim);
 
-    return HAL_OK;
+    return STMLIBS_OK;
 }
 
 LONGCOUNTER_Counter_Type LONGCOUNTER_get_counter(LONGCOUNTER_HandleTypeDef *handle) {

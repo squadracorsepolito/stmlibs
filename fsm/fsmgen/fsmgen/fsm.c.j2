@@ -37,7 +37,7 @@ FSM_ConfigTypeDef config = {
     .state_table = state_table,
 };
 
-HAL_StatusTypeDef FSM_{{ name | upper }}_init(
+STMLIBS_StatusTypeDef FSM_{{ name | upper }}_init(
     FSM_HandleTypeDef *handle,
     uint8_t event_count,
     FSM_callback_function run_callback,

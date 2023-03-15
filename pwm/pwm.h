@@ -12,6 +12,7 @@
 #define PWM_H
 
 #include "main.h"
+#include "stmlibs_status.h"
 
 #include <inttypes.h>
 
@@ -20,33 +21,33 @@
  * 
  * @param     htim Timer handle
  * @param     period_ms Period to be setted that will be common for each channel
- * @return    HAL_OK on success, HAL_ERROR on failure
+ * @return    STMLIBS_OK on success, STMLIBS_ERROR on failure
  */
-HAL_StatusTypeDef PWM_init(TIM_HandleTypeDef *htim, float period_ms);
+STMLIBS_StatusTypeDef PWM_init(TIM_HandleTypeDef *htim, float period_ms);
 /**
  * @brief     Start the specified channel 
  * 
  * @param     htim Timer handle
  * @param     duty_cycle Duty cycle to be setted on the specified channel (expressed as a 0-1 value)
  * @param     channel Channel to be started
- * @return    HAL_OK on success, HAL_ERROR on failure
+ * @return    STMLIBS_OK on success, STMLIBS_ERROR on failure
  */
-HAL_StatusTypeDef PWM_start(TIM_HandleTypeDef *htim, float duty_cycle, uint32_t channel);
+STMLIBS_StatusTypeDef PWM_start(TIM_HandleTypeDef *htim, float duty_cycle, uint32_t channel);
 /**
  * @brief     Stop the specified channel 
  * 
  * @param     htim Timer handle
  * @param     channel Channel to be stopped
- * @return    HAL_OK on success, HAL_ERROR on failure
+ * @return    STMLIBS_OK on success, STMLIBS_ERROR on failure
  */
-HAL_StatusTypeDef PWM_stop(TIM_HandleTypeDef *htim, uint32_t channel);
+STMLIBS_StatusTypeDef PWM_stop(TIM_HandleTypeDef *htim, uint32_t channel);
 /**
  * @brief     Set the duty cycle on a given channel, even while channel is running 
  * 
  * @param     htim Timer handle
  * @param     duty_cycle Duty cycle to be setted on the specified channel (expressed as a 0-1 value)
  * @param     channel Channel to be started
- * @return    HAL_OK on success, HAL_ERROR on failure
+ * @return    STMLIBS_OK on success, STMLIBS_ERROR on failure
  */
-HAL_StatusTypeDef PWM_update_duty_cycle(TIM_HandleTypeDef *htim, float duty_cycle, uint32_t channel);
+STMLIBS_StatusTypeDef PWM_update_duty_cycle(TIM_HandleTypeDef *htim, float duty_cycle, uint32_t channel);
 #endif  //PWM_H

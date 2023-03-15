@@ -12,6 +12,7 @@
 #define FSM_H
 
 #include "main.h"
+#include "stmlibs_status.h"
 
 #include <inttypes.h>
 
@@ -58,21 +59,20 @@ typedef struct FSM_HandleStruct FSM_HandleTypeDef;
  * @param     event_count Number of events
  * @param     run_callback Function to be executed on every FSM_routine call
  * @param     transition_callback Function to be executen on every transition
- * @return    HAL_OK on success, HAL_ERROR on failure
+ * @return    STMLIBS_OK on success, STMLIBS_ERROR on failure
  */
-HAL_StatusTypeDef FSM_init(
-    FSM_HandleTypeDef *handle,
-    FSM_ConfigTypeDef *config,
-    uint8_t event_count,
-    FSM_callback_function run_callback,
-    FSM_callback_function transition_callback);
+STMLIBS_StatusTypeDef FSM_init(FSM_HandleTypeDef *handle,
+                               FSM_ConfigTypeDef *config,
+                               uint8_t event_count,
+                               FSM_callback_function run_callback,
+                               FSM_callback_function transition_callback);
 /**
  * @brief     Runs the entry function of the FSM_HandleTypeDef structure 
  * 
  * @param     handle Reference to the initialized struct
- * @return    HAL_OK on success, HAL_ERROR on failure
+ * @return    STMLIBS_OK on success, STMLIBS_ERROR on failure
  */
-HAL_StatusTypeDef FSM_start(FSM_HandleTypeDef *handle);
+STMLIBS_StatusTypeDef FSM_start(FSM_HandleTypeDef *handle);
 /**
  * @brief     Get the current state of the FSM_HandleTypeDef structure 
  * 
@@ -85,14 +85,14 @@ uint32_t FSM_get_state(FSM_HandleTypeDef *handle);
  * 
  * @param     handle Reference to the initialized struct
  * @param     event The event to be triggered
- * @return    HAL_OK on success, HAL_ERROR on failure
+ * @return    STMLIBS_OK on success, STMLIBS_ERROR on failure
  */
-HAL_StatusTypeDef FSM_trigger_event(FSM_HandleTypeDef *handle, uint8_t event);
+STMLIBS_StatusTypeDef FSM_trigger_event(FSM_HandleTypeDef *handle, uint8_t event);
 /**
  * @brief     Routine to be called in the main loop
  * 
  * @param     handle Reference to the initialized struct
- * @return    HAL_OK on success, HAL_ERROR on failure
+ * @return    STMLIBS_OK on success, STMLIBS_ERROR on failure
  */
-HAL_StatusTypeDef FSM_routine(FSM_HandleTypeDef *handle);
+STMLIBS_StatusTypeDef FSM_routine(FSM_HandleTypeDef *handle);
 #endif  //FSM_H

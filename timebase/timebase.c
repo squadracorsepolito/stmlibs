@@ -12,9 +12,11 @@
 
 #include "timer_utils.h"
 
-HAL_StatusTypeDef TIMEBASE_init(TIMEBASE_HandleTypeDef *handle, TIM_HandleTypeDef *htim, uint32_t base_interval_us) {
+STMLIBS_StatusTypeDef TIMEBASE_init(TIMEBASE_HandleTypeDef *handle,
+                                    TIM_HandleTypeDef *htim,
+                                    uint32_t base_interval_us) {
     if (handle == NULL || htim == NULL) {
-        return HAL_ERROR;
+        return STMLIBS_ERROR;
     }
 
     handle->htim             = htim;
@@ -22,7 +24,7 @@ HAL_StatusTypeDef TIMEBASE_init(TIMEBASE_HandleTypeDef *handle, TIM_HandleTypeDe
 
     uint32_t ticks = TIM_MS_TO_TICKS(handle->htim, base_interval_us / 1000.0);
     if (ticks > __HAL_TIM_GetAutoreload(handle->htim)) {
-        return HAL_ERROR;
+        return STMLIBS_ERROR;
     }
 
     __HAL_TIM_SetAutoreload(handle->htim, ticks);
@@ -31,20 +33,22 @@ HAL_StatusTypeDef TIMEBASE_init(TIMEBASE_HandleTypeDef *handle, TIM_HandleTypeDe
     handle->intervals_length   = 0;
     handle->intervals_flag     = 0;
 
-    return HAL_OK;
+    return STMLIBS_OK;
 }
 
-HAL_StatusTypeDef TIMEBASE_add_interval(TIMEBASE_HandleTypeDef *handle, uint32_t interval_us, uint8_t *interval_index) {
+STMLIBS_StatusTypeDef TIMEBASE_add_interval(TIMEBASE_HandleTypeDef *handle,
+                                            uint32_t interval_us,
+                                            uint8_t *interval_index) {
     if (handle == NULL) {
-        return HAL_ERROR;
+        return STMLIBS_ERROR;
     }
 
     if (interval_us % handle->base_interval_us != 0) {
-        return HAL_ERROR;
+        return STMLIBS_ERROR;
     }
 
     if (handle->intervals_length == TIMEBASE_MAX_INTERVALS) {
-        return HAL_ERROR;
+        return STMLIBS_ERROR;
     }
 
     if (handle->intervals_length == 0) {
@@ -60,37 +64,36 @@ HAL_StatusTypeDef TIMEBASE_add_interval(TIMEBASE_HandleTypeDef *handle, uint32_t
 
     ++handle->intervals_length;
 
-    return HAL_OK;
+    return STMLIBS_OK;
 }
 
-HAL_StatusTypeDef TIMEBASE_register_callback(
-    TIMEBASE_HandleTypeDef *handle,
-    uint8_t interval_index,
-    TIMEBASE_CallbackTypeDef callback) {
+STMLIBS_StatusTypeDef TIMEBASE_register_callback(TIMEBASE_HandleTypeDef *handle,
+                                                 uint8_t interval_index,
+                                                 TIMEBASE_CallbackTypeDef callback) {
     if (handle == NULL) {
-        return HAL_ERROR;
+        return STMLIBS_ERROR;
     }
 
     TIMEBASE_IntervalTypeDef *interval = &handle->intervals[interval_index];
 
     if (interval->callbacks_length == TIMEBASE_MAX_CALLBACKS) {
-        return HAL_ERROR;
+        return STMLIBS_ERROR;
     }
 
     if (callback == NULL) {
-        return HAL_ERROR;
+        return STMLIBS_ERROR;
     }
 
     interval->callbacks[interval->callbacks_length] = callback;
 
     ++interval->callbacks_length;
 
-    return HAL_OK;
+    return STMLIBS_OK;
 }
 
-HAL_StatusTypeDef TIMEBASE_routine(TIMEBASE_HandleTypeDef *handle) {
+STMLIBS_StatusTypeDef TIMEBASE_routine(TIMEBASE_HandleTypeDef *handle) {
     if (handle == NULL) {
-        return HAL_ERROR;
+        return STMLIBS_ERROR;
     }
 
     if (handle->intervals_flag & (1 << handle->intervals_length)) {
@@ -108,7 +111,7 @@ HAL_StatusTypeDef TIMEBASE_routine(TIMEBASE_HandleTypeDef *handle) {
             continue;
 
         for (uint8_t j = 0; j < handle->intervals[i].callbacks_length; ++j) {
-            if (handle->intervals[i].callbacks[j]() != HAL_OK) {
+            if (handle->intervals[i].callbacks[j]() != STMLIBS_OK) {
                 // LOG SOMEHOW
             }
         }
@@ -116,7 +119,7 @@ HAL_StatusTypeDef TIMEBASE_routine(TIMEBASE_HandleTypeDef *handle) {
         handle->intervals_flag &= ~(1 << i);
     }
 
-    return HAL_OK;
+    return STMLIBS_OK;
 }
 
 void TIMEBASE_TimerElapsedCallback(TIMEBASE_HandleTypeDef *handle, TIM_HandleTypeDef *htim) {

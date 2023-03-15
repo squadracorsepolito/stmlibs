@@ -12,10 +12,11 @@
 #define LOGGER_H
 
 #include "main.h"
+#include "stmlibs_status.h"
 
 typedef enum { LOGGER_INFO, LOGGER_DEBUG, LOGGER_WARNING, LOGGER_ERROR } LOGGER_MODE;
 
-typedef HAL_StatusTypeDef (*LOGGER_flushTypeDef)(char *buffer, uint32_t size);
+typedef STMLIBS_StatusTypeDef (*LOGGER_flushTypeDef)(char *buffer, uint32_t size);
 
 struct LOGGER_HandleStruct {
     char *buffer;
@@ -25,12 +26,11 @@ struct LOGGER_HandleStruct {
 };
 typedef struct LOGGER_HandleStruct LOGGER_HandleTypeDef;
 
-HAL_StatusTypeDef LOGGER_init(
-    LOGGER_HandleTypeDef *handle,
-    char *buffer,
-    uint32_t buffer_len,
-    LOGGER_flushTypeDef flush_raw);
-HAL_StatusTypeDef LOGGER_log(LOGGER_HandleTypeDef *handle, LOGGER_MODE mode, char *template, ...);
-HAL_StatusTypeDef LOGGER_flush(LOGGER_HandleTypeDef *handle);
+STMLIBS_StatusTypeDef LOGGER_init(LOGGER_HandleTypeDef *handle,
+                                  char *buffer,
+                                  uint32_t buffer_len,
+                                  LOGGER_flushTypeDef flush_raw);
+STMLIBS_StatusTypeDef LOGGER_log(LOGGER_HandleTypeDef *handle, LOGGER_MODE mode, char *template, ...);
+STMLIBS_StatusTypeDef LOGGER_flush(LOGGER_HandleTypeDef *handle);
 
 #endif  //LOGGER_H

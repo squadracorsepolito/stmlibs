@@ -13,19 +13,20 @@
 
 #include "critical_section.h"
 #include "main.h"
+#include "stmlibs_status.h"
 
 typedef uint8_t LOCK_TypeDef;
 
-#define LOCK_LOCK(FLAG)      \
-    do {                     \
-        CS_ENTER();          \
-        if (!(FLAG)) {       \
-            (FLAG) = 1;      \
-            CS_EXIT();       \
-        } else {             \
-            CS_EXIT()        \
-            return HAL_BUSY; \
-        }                    \
+#define LOCK_LOCK(FLAG)          \
+    do {                         \
+        CS_ENTER();              \
+        if (!(FLAG)) {           \
+            (FLAG) = 1;          \
+            CS_EXIT();           \
+        } else {                 \
+            CS_EXIT()            \
+            return STMLIBS_BUSY; \
+        }                        \
     } while (0);
 
 #define LOCK_UNLOCK(FLAG) \

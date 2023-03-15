@@ -12,8 +12,9 @@
 #define CIRCULAR_BUFFER_H
 
 #include "main.h"
+#include "stmlibs_status.h"
 
-#include <stdint.h>
+#include <inttypes.h>
 
 struct CIRCULAR_BUFFER_HandleStruct {
     void *buffer;
@@ -24,13 +25,13 @@ struct CIRCULAR_BUFFER_HandleStruct {
 };
 typedef struct CIRCULAR_BUFFER_HandleStruct CIRCULAR_BUFFER_HandleTypeDef;
 
-HAL_StatusTypeDef CIRCULAR_BUFFER_init(CIRCULAR_BUFFER_HandleTypeDef *handle,
-                                       void *buffer,
-                                       uint32_t length,
-                                       uint32_t el_size);
+STMLIBS_StatusTypeDef CIRCULAR_BUFFER_init(CIRCULAR_BUFFER_HandleTypeDef *handle,
+                                           void *buffer,
+                                           uint32_t length,
+                                           uint32_t el_size);
 
-HAL_StatusTypeDef CIRCULAR_BUFFER_enqueue(CIRCULAR_BUFFER_HandleTypeDef *handle, void *obj);
+STMLIBS_StatusTypeDef CIRCULAR_BUFFER_enqueue(CIRCULAR_BUFFER_HandleTypeDef *handle, void *obj);
 
-HAL_StatusTypeDef CIRCULAR_BUFFER_dequeue(CIRCULAR_BUFFER_HandleTypeDef *handle, void *obj);
+STMLIBS_StatusTypeDef CIRCULAR_BUFFER_dequeue(CIRCULAR_BUFFER_HandleTypeDef *handle, void *obj);
 
 #endif  //CIRCULAR_BUFFER_H

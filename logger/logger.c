@@ -28,21 +28,20 @@
 #define LOGGER_WARNING_STRING YELLOW_BG("[WRN]")
 #define LOGGER_ERROR_STRING   RED_BG("[ERR]")
 
-HAL_StatusTypeDef LOGGER_init(
-    LOGGER_HandleTypeDef *handle,
-    char *buffer,
-    uint32_t buffer_len,
-    LOGGER_flushTypeDef flush_raw) {
+STMLIBS_StatusTypeDef LOGGER_init(LOGGER_HandleTypeDef *handle,
+                                  char *buffer,
+                                  uint32_t buffer_len,
+                                  LOGGER_flushTypeDef flush_raw) {
     if (handle == NULL) {
-        return HAL_ERROR;
+        return STMLIBS_ERROR;
     }
 
     if (buffer == NULL) {
-        return HAL_ERROR;
+        return STMLIBS_ERROR;
     }
 
     if (flush_raw == NULL) {
-        return HAL_ERROR;
+        return STMLIBS_ERROR;
     }
 
     handle->buffer     = buffer;
@@ -50,20 +49,20 @@ HAL_StatusTypeDef LOGGER_init(
     handle->index      = 0;
     handle->flush_raw  = flush_raw;
 
-    return HAL_OK;
+    return STMLIBS_OK;
 }
 
-HAL_StatusTypeDef LOGGER_log(LOGGER_HandleTypeDef *handle, LOGGER_MODE mode, char *template, ...) {
+STMLIBS_StatusTypeDef LOGGER_log(LOGGER_HandleTypeDef *handle, LOGGER_MODE mode, char *template, ...) {
     if (handle == NULL) {
-        return HAL_ERROR;
+        return STMLIBS_ERROR;
     }
 
     if (template == NULL) {
-        return HAL_ERROR;
+        return STMLIBS_ERROR;
     }
 
     if (handle->index >= handle->buffer_len - 1) {
-        return HAL_ERROR;
+        return STMLIBS_ERROR;
     }
 
     CS_ENTER();
@@ -87,7 +86,7 @@ HAL_StatusTypeDef LOGGER_log(LOGGER_HandleTypeDef *handle, LOGGER_MODE mode, cha
             s = LOGGER_ERROR_STRING;
             break;
         default:
-            return HAL_ERROR;
+            return STMLIBS_ERROR;
     }
 
     handle->index += snprintf(handle->buffer + handle->index, handle->buffer_len - handle->index - 1, "%s ", s);
@@ -100,25 +99,24 @@ HAL_StatusTypeDef LOGGER_log(LOGGER_HandleTypeDef *handle, LOGGER_MODE mode, cha
     CS_EXIT();
 
     if (handle->index >= handle->buffer_len) {
-        return HAL_ERROR;
+        return STMLIBS_ERROR;
     }
 
-    return HAL_OK;
+    return STMLIBS_OK;
 }
 
-HAL_StatusTypeDef LOGGER_flush(LOGGER_HandleTypeDef *handle) {
+STMLIBS_StatusTypeDef LOGGER_flush(LOGGER_HandleTypeDef *handle) {
     if (handle == NULL) {
-        return HAL_ERROR;
+        return STMLIBS_ERROR;
     }
 
-    static HAL_StatusTypeDef errorcode = HAL_OK;
+    static STMLIBS_StatusTypeDef errorcode = STMLIBS_OK;
 
     if (handle->index == 0) {
-        return HAL_OK;
+        return STMLIBS_OK;
     }
 
-    if ((errorcode = handle->flush_raw(handle->buffer, handle->index)) != HAL_OK) {
-        volatile uint8_t a = 0;
+    if ((errorcode = handle->flush_raw(handle->buffer, handle->index)) != STMLIBS_OK) {
         return errorcode;
     }
     handle->buffer[0] = '\0';

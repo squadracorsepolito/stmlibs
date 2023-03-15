@@ -11,7 +11,9 @@
 #define ERROR_UTILS_H
 
 #include "main.h"
-#include "stdint.h"
+#include "stmlibs_status.h"
+
+#include <inttypes.h>
 
 typedef void (*ERROR_UTILS_CallbackTypeDef)(uint8_t error_index, uint8_t instance_index);
 
@@ -47,27 +49,24 @@ struct ERROR_UTILS_HandleStruct {
 };
 typedef struct ERROR_UTILS_HandleStruct ERROR_UTILS_HandleTypeDef;
 
-HAL_StatusTypeDef ERROR_UTILS_init(
-    ERROR_UTILS_HandleTypeDef *handle,
-    TIM_HandleTypeDef *htim,
-    ERROR_UTILS_ConfigTypeDef *config,
-    ERROR_UTILS_CallbackTypeDef global_toggle_callback,
-    ERROR_UTILS_CallbackTypeDef global_expiry_callback);
+STMLIBS_StatusTypeDef ERROR_UTILS_init(ERROR_UTILS_HandleTypeDef *handle,
+                                       TIM_HandleTypeDef *htim,
+                                       ERROR_UTILS_ConfigTypeDef *config,
+                                       ERROR_UTILS_CallbackTypeDef global_toggle_callback,
+                                       ERROR_UTILS_CallbackTypeDef global_expiry_callback);
 
-HAL_StatusTypeDef ERROR_UTILS_error_set(
-    ERROR_UTILS_HandleTypeDef *handle,
-    uint32_t error_index,
-    uint32_t instance_index);
+STMLIBS_StatusTypeDef ERROR_UTILS_error_set(ERROR_UTILS_HandleTypeDef *handle,
+                                            uint32_t error_index,
+                                            uint32_t instance_index);
 
-HAL_StatusTypeDef ERROR_UTILS_error_reset(
-    ERROR_UTILS_HandleTypeDef *handle,
-    uint32_t error_index,
-    uint32_t instance_index);
+STMLIBS_StatusTypeDef ERROR_UTILS_error_reset(ERROR_UTILS_HandleTypeDef *handle,
+                                              uint32_t error_index,
+                                              uint32_t instance_index);
 
 uint8_t ERROR_UTILS_is_set(ERROR_UTILS_HandleTypeDef *handle, uint32_t error_index, uint32_t instance_index);
 
 uint32_t ERROR_UTILS_get_count(ERROR_UTILS_HandleTypeDef *handle);
 
-HAL_StatusTypeDef ERROR_UTILS_TimerElapsedCallback(ERROR_UTILS_HandleTypeDef *handle, TIM_HandleTypeDef *htim);
+STMLIBS_StatusTypeDef ERROR_UTILS_TimerElapsedCallback(ERROR_UTILS_HandleTypeDef *handle, TIM_HandleTypeDef *htim);
 
 #endif  //ERROR_UTILS_H

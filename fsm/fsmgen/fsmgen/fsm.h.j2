@@ -35,7 +35,7 @@ typedef enum FSM_{{ name | upper }}_StateEnum FSM_{{ name | upper }}_StateTypeDe
  * @param transition_callback callback of a transition event
  * @return status
  */
-HAL_StatusTypeDef FSM_{{ name | upper }}_init(
+STMLIBS_StatusTypeDef FSM_{{ name | upper }}_init(
     FSM_HandleTypeDef *handle,
     uint8_t event_count,
     FSM_callback_function run_callback,

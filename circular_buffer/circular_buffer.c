@@ -12,16 +12,16 @@
 
 #include <string.h>
 
-HAL_StatusTypeDef CIRCULAR_BUFFER_init(CIRCULAR_BUFFER_HandleTypeDef *handle,
-                                       void *buffer,
-                                       uint32_t length,
-                                       uint32_t el_size) {
+STMLIBS_StatusTypeDef CIRCULAR_BUFFER_init(CIRCULAR_BUFFER_HandleTypeDef *handle,
+                                           void *buffer,
+                                           uint32_t length,
+                                           uint32_t el_size) {
     if (handle == NULL) {
-        return HAL_ERROR;
+        return STMLIBS_ERROR;
     }
 
     if (buffer == NULL) {
-        return HAL_ERROR;
+        return STMLIBS_ERROR;
     }
 
     handle->buffer = buffer;
@@ -30,7 +30,7 @@ HAL_StatusTypeDef CIRCULAR_BUFFER_init(CIRCULAR_BUFFER_HandleTypeDef *handle,
     handle->head   = 0;
     handle->tail   = 0;
 
-    return HAL_OK;
+    return STMLIBS_OK;
 }
 
 uint8_t CIRCULAR_BUFFER_is_full(CIRCULAR_BUFFER_HandleTypeDef *handle) {
@@ -49,40 +49,40 @@ uint8_t CIRCULAR_BUFFER_is_empty(CIRCULAR_BUFFER_HandleTypeDef *handle) {
     return handle->head == handle->tail;
 }
 
-HAL_StatusTypeDef CIRCULAR_BUFFER_enqueue(CIRCULAR_BUFFER_HandleTypeDef *handle, void *obj) {
+STMLIBS_StatusTypeDef CIRCULAR_BUFFER_enqueue(CIRCULAR_BUFFER_HandleTypeDef *handle, void *obj) {
     if (handle == NULL) {
-        return HAL_ERROR;
+        return STMLIBS_ERROR;
     }
 
     if (obj == NULL) {
-        return HAL_ERROR;
+        return STMLIBS_ERROR;
     }
 
     if (CIRCULAR_BUFFER_is_full(handle)) {
-        return HAL_ERROR;
+        return STMLIBS_ERROR;
     }
 
     memcpy(handle->buffer + handle->head, obj, handle->size);
     handle->head = (handle->head + 1) & handle->length;
 
-    return HAL_OK;
+    return STMLIBS_OK;
 }
 
-HAL_StatusTypeDef CIRCULAR_BUFFER_dequeue(CIRCULAR_BUFFER_HandleTypeDef *handle, void *obj) {
+STMLIBS_StatusTypeDef CIRCULAR_BUFFER_dequeue(CIRCULAR_BUFFER_HandleTypeDef *handle, void *obj) {
     if (handle == NULL) {
-        return HAL_ERROR;
+        return STMLIBS_ERROR;
     }
 
     if (obj == NULL) {
-        return HAL_ERROR;
+        return STMLIBS_ERROR;
     }
 
     if (CIRCULAR_BUFFER_is_empty(handle)) {
-        return HAL_ERROR;
+        return STMLIBS_ERROR;
     }
 
     memcpy(obj, handle->buffer + handle->tail, handle->size);
     handle->tail = (handle->tail + 1) % handle->length;
 
-    return HAL_OK;
+    return STMLIBS_OK;
 }
