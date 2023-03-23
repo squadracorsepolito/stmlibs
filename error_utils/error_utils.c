@@ -37,7 +37,7 @@ STMLIBS_StatusTypeDef ERROR_UTILS_init(ERROR_UTILS_HandleTypeDef *handle,
     handle->config                         = config;
 
     for (uint32_t i = 0; i < handle->config->errors_length; ++i) {
-        if (TIM_MS_TO_TICKS(htim, handle->config->errors_array[i].expiry_delay_ms) > TIM_GET_MAX_AUTORELOAD(htim)) {
+        if (TIM_MS_TO_TICKS(htim, handle->config->errors_array[i].expiry_delay_ms) - 1 > TIM_GET_MAX_AUTORELOAD(htim)) {
             return STMLIBS_ERROR;
         }
         for (uint32_t j = 0; j < handle->config->errors_array[i].instances_length; ++j) {
@@ -75,7 +75,7 @@ STMLIBS_StatusTypeDef _ERROR_UTILS_set_timer(ERROR_UTILS_HandleTypeDef *handle, 
     if (handle == NULL) {
         return STMLIBS_ERROR;
     }
-    uint32_t ticks = TIM_MS_TO_TICKS(handle->htim, _ERROR_UTILS_get_delta_from_now(expiry));
+    uint32_t ticks = TIM_MS_TO_TICKS(handle->htim, _ERROR_UTILS_get_delta_from_now(expiry)) - 1;
 
     if (ticks > TIM_GET_MAX_AUTORELOAD(handle->htim)) {
         return STMLIBS_ERROR;

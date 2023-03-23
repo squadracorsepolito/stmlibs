@@ -17,7 +17,7 @@ STMLIBS_StatusTypeDef PWM_init(TIM_HandleTypeDef *htim, float period_ms) {
         return STMLIBS_ERROR;
     }
 
-    uint32_t ticks = TIM_MS_TO_TICKS(htim, period_ms);
+    uint32_t ticks = TIM_MS_TO_TICKS(htim, period_ms) - 1;
     if (ticks > __HAL_TIM_GetAutoreload(htim)) {
         return STMLIBS_ERROR;
     }

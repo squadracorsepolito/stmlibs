@@ -22,7 +22,7 @@ STMLIBS_StatusTypeDef TIMEBASE_init(TIMEBASE_HandleTypeDef *handle,
     handle->htim             = htim;
     handle->base_interval_us = base_interval_us;
 
-    uint32_t ticks = TIM_MS_TO_TICKS(handle->htim, base_interval_us / 1000.0);
+    uint32_t ticks = TIM_MS_TO_TICKS(handle->htim, base_interval_us / 1000.0) - 1;
     if (ticks > __HAL_TIM_GetAutoreload(handle->htim)) {
         return STMLIBS_ERROR;
     }
