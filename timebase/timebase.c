@@ -1,9 +1,9 @@
 /*
  * "THE BEER-WARE LICENSE" (Revision 69):
  * Squadra Corse firmware team wrote this file. As long as you retain this notice
- * you can do whatever you want with this stuff. If we meet some day, and you 
+ * you can do whatever you want with this stuff. If we meet some day, and you
  * think this stuff is worth it, you can buy us a beer in return.
- * 
+ *
  * Authors
  * - Federico Carbone [federico.carbone.sc@gmail.com]
  */
@@ -23,7 +23,7 @@ STMLIBS_StatusTypeDef TIMEBASE_init(TIMEBASE_HandleTypeDef *handle,
     handle->base_interval_us = base_interval_us;
 
     uint32_t ticks = TIM_MS_TO_TICKS(handle->htim, base_interval_us / 1000.0) - 1;
-    if (ticks > __HAL_TIM_GetAutoreload(handle->htim)) {
+    if (ticks > TIM_GET_MAX_AUTORELOAD(handle->htim)) {
         return STMLIBS_ERROR;
     }
 
