@@ -19,11 +19,12 @@
 #define NORMAL                 "\033[0m"
 #define WHITE_BG(S)            "\033[0;47m" S NORMAL
 #define RED_BG(S)              "\033[0;41m" S NORMAL
+#define GREEN_BG(S)            "\033[0;42m" S NORMAL
 #define YELLOW_BG(S)           "\033[0;43m" S NORMAL
 #define CYAN_BG(S)             "\033[0;46m" S NORMAL
 #define RED_BG_ON_YELLOW_FG(S) "\033[0;31;43m" S NORMAL
 
-#define LOGGER_INFO_STRING    WHITE_BG("[INFO]")
+#define LOGGER_INFO_STRING    GREEN_BG("[INFO]")
 #define LOGGER_DEBUG_STRING   WHITE_BG("[DBG]")
 #define LOGGER_WARNING_STRING YELLOW_BG("[WRN]")
 #define LOGGER_ERROR_STRING   RED_BG("[ERR]")
