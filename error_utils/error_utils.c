@@ -92,19 +92,23 @@ STMLIBS_StatusTypeDef _ERROR_UTILS_set_timer(ERROR_UTILS_HandleTypeDef *handle, 
 STMLIBS_StatusTypeDef ERROR_UTILS_error_set(ERROR_UTILS_HandleTypeDef *handle,
                                             uint32_t error_index,
                                             uint32_t instance_index) {
+    STMLIBS_StatusTypeDef errorcode = STMLIBS_OK;
     //enter critical section
     CS_ENTER()
 
     if (handle == NULL) {
-        return STMLIBS_ERROR;
+        errorcode = STMLIBS_ERROR;
+        goto exit;
     }
 
     if (error_index >= handle->config->errors_length) {
-        return STMLIBS_ERROR;
+        errorcode = STMLIBS_ERROR;
+        goto exit;
     }
 
     if (instance_index >= handle->config->errors_array[error_index].instances_length) {
-        return STMLIBS_ERROR;
+        errorcode = STMLIBS_ERROR;
+        goto exit;
     }
 
     ERROR_UTILS_ErrorInstanceTypeDef *instance = &(handle->config->errors_array[error_index].instances[instance_index]);
@@ -121,7 +125,8 @@ STMLIBS_StatusTypeDef ERROR_UTILS_error_set(ERROR_UTILS_HandleTypeDef *handle,
         if (first_to_expire_inst == NULL || !first_to_expire_inst->is_triggered ||
             _ERROR_UTILS_is_before(instance->expected_expiry_ms, first_to_expire_inst->expected_expiry_ms)) {
             if (_ERROR_UTILS_set_timer(handle, instance->expected_expiry_ms) != STMLIBS_OK) {
-                return STMLIBS_ERROR;
+                errorcode = STMLIBS_ERROR;
+                goto exit;
             }
 
             handle->first_to_expire_error_index    = error_index;
@@ -140,9 +145,9 @@ STMLIBS_StatusTypeDef ERROR_UTILS_error_set(ERROR_UTILS_HandleTypeDef *handle,
         }
     }
 
+exit:
     CS_EXIT();
-
-    return STMLIBS_OK;
+    return errorcode;
 }
 
 STMLIBS_StatusTypeDef _ERROR_UTILS_find_first_expiring_and_set_timer(ERROR_UTILS_HandleTypeDef *handle) {
@@ -187,19 +192,23 @@ STMLIBS_StatusTypeDef _ERROR_UTILS_find_first_expiring_and_set_timer(ERROR_UTILS
 STMLIBS_StatusTypeDef ERROR_UTILS_error_reset(ERROR_UTILS_HandleTypeDef *handle,
                                               uint32_t error_index,
                                               uint32_t instance_index) {
+    STMLIBS_StatusTypeDef errorcode = STMLIBS_OK;
     //enter critical section
     CS_ENTER();
 
     if (handle == NULL) {
-        return STMLIBS_ERROR;
+        errorcode = STMLIBS_ERROR;
+        goto exit;
     }
 
     if (error_index >= handle->config->errors_length) {
-        return STMLIBS_ERROR;
+        errorcode = STMLIBS_ERROR;
+        goto exit;
     }
 
     if (instance_index >= handle->config->errors_array[error_index].instances_length) {
-        return STMLIBS_ERROR;
+        errorcode = STMLIBS_ERROR;
+        goto exit;
     }
 
     ERROR_UTILS_ErrorInstanceTypeDef *instance = &(handle->config->errors_array[error_index].instances[instance_index]);
@@ -209,7 +218,8 @@ STMLIBS_StatusTypeDef ERROR_UTILS_error_reset(ERROR_UTILS_HandleTypeDef *handle,
         --handle->count;
 
         if (_ERROR_UTILS_find_first_expiring_and_set_timer(handle) != STMLIBS_OK) {
-            return STMLIBS_ERROR;
+            errorcode = STMLIBS_ERROR;
+            goto exit;
         }
 
         if (handle->config->errors_array[error_index].toggle_callback != NULL) {
@@ -221,8 +231,8 @@ STMLIBS_StatusTypeDef ERROR_UTILS_error_reset(ERROR_UTILS_HandleTypeDef *handle,
         }
     }
 
+exit:
     CS_EXIT();
-
     return STMLIBS_OK;
 }
 uint8_t ERROR_UTILS_is_set(ERROR_UTILS_HandleTypeDef *handle, uint32_t error_index, uint32_t instance_index) {
