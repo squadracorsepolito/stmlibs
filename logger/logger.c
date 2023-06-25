@@ -90,7 +90,7 @@ STMLIBS_StatusTypeDef LOGGER_log(LOGGER_HandleTypeDef *handle, LOGGER_MODE mode,
             return STMLIBS_ERROR;
     }
 
-    handle->index += snprintf(handle->buffer + handle->index, handle->buffer_len - handle->index - 1, "%s[%5d] ", s, HAL_GetTick());
+    handle->index += snprintf(handle->buffer + handle->index, handle->buffer_len - handle->index - 1, "%s[%5ld] ", s, HAL_GetTick());
 
     va_list args;
     va_start(args, template);

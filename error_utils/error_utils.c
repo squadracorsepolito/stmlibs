@@ -233,7 +233,7 @@ STMLIBS_StatusTypeDef ERROR_UTILS_error_reset(ERROR_UTILS_HandleTypeDef *handle,
 
 exit:
     CS_EXIT();
-    return STMLIBS_OK;
+    return errorcode;
 }
 uint8_t ERROR_UTILS_is_set(ERROR_UTILS_HandleTypeDef *handle, uint32_t error_index, uint32_t instance_index) {
     if (handle == NULL) {
