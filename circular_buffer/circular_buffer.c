@@ -63,7 +63,7 @@ STMLIBS_StatusTypeDef CIRCULAR_BUFFER_enqueue(CIRCULAR_BUFFER_HandleTypeDef *han
     }
 
     memcpy(handle->buffer + handle->head, obj, handle->size);
-    handle->head = (handle->head + 1) & handle->length;
+    handle->head = (handle->head + 1) % handle->length;
 
     return STMLIBS_OK;
 }
