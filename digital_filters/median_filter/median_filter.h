@@ -17,19 +17,54 @@
  (#) Initialze a MEDFILT_Handle struct and an array of MEDFILT_Node strutct of
      constant length.
      ** NOTE: The array length must be odd and >1 ** eg:
+
      #define MEDFILT_WINDOW_LEN 7
      static struct MEDFILT_Handle hmedfilt;
      static struct MEDFILT_Node medianfilter_window[MEDFILT_WINDOW_LEN];
 
  (#) Assign the previous instantiated MEDFILT_Handle struct with correct values:
+
      hmedfilt.window = medianfilter_window;
      hmedfilt.window_len = MEDFILT_WINDOW_LEN;
+
  (#) Call MEDFILT_Init, e.g.:
+
      MEFILT_Init(&hmedfilt);
+
  (#) In the sample acquisition loop/callback run:
+
      MEDFILT_value_t new_sample,filtered_sample;
      ADC_GetNewValue(&hadc,(uint16_t*)&new_sample);
      filtered_sample = MEDFILT_Insert(&hMedianFilter,new_sample);
+
+                             ##### PERFORMANCE #####
+ ===============================================================================
+ The filter has O(WINDOW_LEN) space complexity and O(WINDOW_LEN) time complexity
+ when new nodes are added.
+
+                          ##### Internal Details #####
+ ===============================================================================
+ The window is a statically declared buffer of linked nodes making it a double 
+ linked list with circular linking.
+
+ When a new node/sample is inserted in the list the oldest inserted node is used
+ as the instance for the new node. 
+ The oldest node is always relocated in the list when inserting a new one.
+
+ The window has two main views depending on which type of pointers in a node are
+ used to traverse it: 
+ - `nextByAge`: iterates to the next oldest inserted node, itrerating through
+                these pointers is like using a queue (first in first out). The
+                pointer `oldestNode` points to the oldest inserted node in
+                the window a.k.a. the head of a queue
+- `nextByValue`: iterates to the next minimal valued node in the window: 
+                 the pointed node will have a greater or equal value.
+                 The `minValueNode` always points to the node with smallest
+                 value in the window.
+- `prevByValue`: iterates to the previous minimal valued node in the window:
+                 the pointed node will have a smaller or equal value.
+ One additional pointer is `medianValueNode` that points to the current
+ median value node of the window.
  @endverbatim
  */
 
@@ -50,6 +85,39 @@
 
 /* Exported macros -----------------------------------------------------------*/
 
+/* Internal macros -----------------------------------------------------------*/
+
+/**
+ * @brief Insert (byValue view) a node between two other nodes
+ * @param nodePrev_ptr A pointer to struct MEDFILT_Node that will become the
+ *        prev link to newNode
+ * @param nodeNext_ptr A pointer to struct MEDFILT_Node that will become the
+ *        next link to newNode
+ * @param newNode_ptr A pointer to struct MEDFILT_Node that will be inserted
+ *        between prevNode and nextNode
+ */
+#define __BYVALUE_INSERT_NODE_BETWEEN(nodePrev_ptr, nodeNext_ptr, newNode_ptr) \
+    do {                                                                       \
+        newNode_ptr->prevByValue  = nodePrev_ptr;                              \
+        newNode_ptr->nextByValue  = nodeNext_ptr;                              \
+        nodeNext_ptr->prevByValue = newNode_ptr;                               \
+        nodePrev_ptr->nextByValue = newNode_ptr;                               \
+    } while (0)
+
+/**
+ * @brief Link (byValue view) two nodes so that next/prevByValue pointers link
+ *        to each other. 
+ * @param nodePrev_ptr A pointer to struct MEDFILT_Node that will be the link
+ *        prevByValue to node nodeNext_ptr
+ * @param nodeNext_ptr A pointer to struct MEDFILT_Node that will be the link 
+ *        next to node nodePrev_ptr
+ */
+#define __BYVALUE_LINK_NODES(nodePrev_ptr, nodeNext_ptr) \
+    do {                                                 \
+        nodeNext_ptr->prevByValue = nodePrev_ptr;        \
+        nodePrev_ptr->nextByValue = nodeNext_ptr;        \
+    } while (0)
+
 /* Exported types ------------------------------------------------------------*/
 
 typedef MEDFILT_NODE_VALUE_T MEDFILT_value_t;
@@ -66,11 +134,11 @@ struct MEDFILT_Node {
 };
 
 struct MEDFILT_Handle {
-    size_t window_len;                        /*!< nodes window length @note: MUST BE ODD and >1 */
-    struct MEDFILT_Node *window;              /*!< pointer to nodes buffer called window */
-    struct MEDFILT_Node *oldestNode_ptr;      /*!< pointer to the oldest inserted node in the window */
-    struct MEDFILT_Node *minValueNode_ptr;    /*!< pointer to smallest value */
-    struct MEDFILT_Node *medianValueNode_ptr; /*!< pointer to node with median value */
+    size_t window_len;                    /*!< nodes window length @note: MUST BE ODD and >1 */
+    struct MEDFILT_Node *window;          /*!< pointer to nodes buffer called window */
+    struct MEDFILT_Node *oldestNode;      /*!< pointer to the oldest inserted node in the window */
+    struct MEDFILT_Node *minValueNode;    /*!< pointer to smallest value */
+    struct MEDFILT_Node *medianValueNode; /*!< pointer to node with median value */
 };
 
 /* Exported functions --------------------------------------------------------*/
@@ -94,9 +162,9 @@ static inline int MEDFILT_Init(struct MEDFILT_Handle *handle) {
             handle->window[(i + 1) % handle->window_len].prevByValue = &handle->window[i];
         }
         // initialize main pointers
-        handle->oldestNode_ptr      = handle->window;
-        handle->minValueNode_ptr    = handle->window;
-        handle->medianValueNode_ptr = &handle->window[handle->window_len / 2];
+        handle->oldestNode      = handle->window;
+        handle->minValueNode    = handle->window;
+        handle->medianValueNode = &handle->window[handle->window_len / 2];
 
         return 0;
     }
@@ -110,102 +178,79 @@ static inline int MEDFILT_Init(struct MEDFILT_Handle *handle) {
   * @param  handle pointer to a handle of MEDFILT
   * @param  sample   new sample value to insert in the window
   * @return The updated median value of the window (a.k.a. filtered output)
+  * @note   PERFORMANCE: the insert procedure is O(WINDOW_LEN) in time
+            O(1) in space
   * @note   The insert procedure relocates always the oldest node in the window
   *         and uses it as the fresh node for the sample value.
   */
 static inline MEDFILT_value_t MEDFILT_Insert(struct MEDFILT_Handle *handle, MEDFILT_value_t sample) {
     struct MEDFILT_Node *newNode, *it;
 
-    if (handle->oldestNode_ptr == handle->minValueNode_ptr) {
+    if (handle->oldestNode == handle->minValueNode) {
         // if oldest inserted node (relocated node) is also the smallest node
         // update minValueNode pointer to next minimum (see @note above)
-        handle->minValueNode_ptr = handle->minValueNode_ptr->nextByValue;
+        handle->minValueNode = handle->minValueNode->nextByValue;
     }
 
-    // if the oldest inserted node (reolcated node) is the current medium
-    // or a bigger value (a node on the mediums right)
-    if ((handle->oldestNode_ptr == handle->medianValueNode_ptr) ||
-        (handle->oldestNode_ptr->value > handle->medianValueNode_ptr->value)) {
-        // move the current medium to the left (a smaller value)
-        handle->medianValueNode_ptr = handle->medianValueNode_ptr->prevByValue;
+    // Move in advance the medianValue pointer to its predecessor if either:
+    // - the oldest inserted node (relocated node) is the current medium
+    //   to avoid losing the medium reference
+    // - the oldest inserted node has a bigger value then the current medium
+    // If the move was not correct it will later be fixed
+    if ((handle->oldestNode == handle->medianValueNode) ||
+        (handle->oldestNode->value > handle->medianValueNode->value)) {
+        handle->medianValueNode = handle->medianValueNode->prevByValue;
     }
 
     // use oldestNode as newNode
-    newNode        = handle->oldestNode_ptr;
+    newNode        = handle->oldestNode;
     newNode->value = sample;
 
-    // "popping" procedure of oldestNode ---------------------------------------
-    // - in the byValue list view of the window (keep min value sorting)
-    //   BEFORE
-    //   |          node1        | <-> | newNode === node2 === OLDEST | <-> |        node3         |
-    //   | ...<-prev next->node2 |     | node1<-prev      next->node3 |     | node2<-prev next->...|
-    handle->oldestNode_ptr->nextByValue->prevByValue = handle->oldestNode_ptr->prevByValue;
-    handle->oldestNode_ptr->prevByValue->nextByValue = handle->oldestNode_ptr->nextByValue;
-    //   AFTER
-    //           +-| newNode === node2 === OLDEST |-+
-    //          /  | node1<-prev      next->node2 |  \
-    //         V                                      V
-    //   |         node1          | <-> |         node3         |
-    //   | ...<-prev  next->node3 |     | node1<-prev next->... |
-    // - in the byAge list view of the window (keep insert time linking)
-    //   BEFORE (node2 is oldest inserted, node7 second-last inserted)
-    //   |       node7         |     | newNode === node2 === OLDEST |
-    //   | ...<-prev next->... |     | node1<-prev      next->node3 |
-    //   | ...<-nextByAge      | <-> | node7<-nextByAge             |
-    handle->oldestNode_ptr = handle->oldestNode_ptr->nextByAge;
-    //   AFTER
-    //   |  node7 === OLDEST   |     |     newNode === node2        |
-    //   | ...<-prev next->... |     | node1<-prev      next->node3 |
-    //   | ...<-nextByAge      | <-> | node7<-nextByAge             |
-    // -------------------------------------------------------------------------
+    // relocation procedure of oldestNode -----------------------------------------
+    // - in the byValue list view of the window, keep min value sorting.
+    //   When oldestNode pointer will be relocated its neighbours have to be linked
+    __BYVALUE_LINK_NODES(handle->oldestNode->prevByValue, handle->oldestNode->nextByValue);
+    // - in the byAge list view of the window, keep insert time linking.
+    //   The oldestNode pointer is updated to the second-last inserted node
+    handle->oldestNode = handle->oldestNode->nextByAge;
+    // ----------------------------------------------------------------------------
 
     // Find where to insert the new node in the "sorted by value" view of the window
     // start from the smallest valued node
-    it = handle->minValueNode_ptr;
+    it = handle->minValueNode;
 
     size_t i;
     for (i = 0; i < handle->window_len - 1; i++) {  // -1 because we "popped" the oldest node
         if (sample < it->value) {
-            // at i == 0 we are comparing the new sample with minValueNode
             if (i == 0) {
-                // use the new value as the new minValueNode
-                handle->minValueNode_ptr = newNode;
+                // if minValueNode is no more the smallest valued node, update minValueNode
+                handle->minValueNode = newNode;
             }
             break;
         }
         it = it->nextByValue;
     }
+
     // `it` will point to the future greater neighbour of newValue: insert newNode before `it`
-    // BEFORE
-    //                  |   newNode === node10   |
-    //                  | node1<-prev next->node3|
-    // |       node4           | <-> |        it === node5    |
-    // | ...<-prev next->node5 |     | node4<-prev  next->... |
-    it->prevByValue->nextByValue = newNode;
-    newNode->prevByValue         = it->prevByValue;
-    it->prevByValue              = newNode;
-    newNode->nextByValue         = it;
-    // AFTER
-    // |         node4           | <-> |  newNode === node10     | <-> |       it === node5     |
-    // | ...<-prev  next->node10 |     | node4<-prev next->node5 |     | node10<-prev next->... |
+    __BYVALUE_INSERT_NODE_BETWEEN(it->prevByValue, it, newNode);
 
     // update median node
     if (i >= (handle->window_len / 2)) {
-        // since only onde node was added, medianValueNode shifts to the next one
-        handle->medianValueNode_ptr = handle->medianValueNode_ptr->nextByValue;
+        // since only one node was added, medianValueNode shifts to the next one
+        handle->medianValueNode = handle->medianValueNode->nextByValue;
     }
 
-    return handle->medianValueNode_ptr->value;
+    return handle->medianValueNode->value;
 }
 
 #ifdef MEDFILT_DEBUG_FN_ON
 #include <stdio.h>
 
 static inline void MEDFILT_printByValue(struct MEDFILT_Handle *handle) {
-    struct MEDFILT_Node *it = handle->minValueNode_ptr;
+    struct MEDFILT_Node *it = handle->minValueNode;
     printf("Value: [ ");
     for (int i = 0; i < handle->window_len; i++) {
-        if (it == handle->medianValueNode_ptr) {
+        if (it == handle->medianValueNode) {
             printf("(%u) ", it->value);
         } else {
             printf("%u ", it->value);
@@ -216,10 +261,10 @@ static inline void MEDFILT_printByValue(struct MEDFILT_Handle *handle) {
 };
 
 static inline void MEDFILT_printByAge(struct MEDFILT_Handle *handle) {
-    struct MEDFILT_Node *it = handle->oldestNode_ptr;
+    struct MEDFILT_Node *it = handle->oldestNode;
     printf("Age:   [ ");
     for (int i = 0; i < handle->window_len; i++) {
-        if (it == handle->medianValueNode_ptr) {
+        if (it == handle->medianValueNode) {
             printf("(%u) ", it->value);
         } else {
             printf("%u ", it->value);
