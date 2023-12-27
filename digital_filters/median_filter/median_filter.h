@@ -44,20 +44,20 @@
 
                           ##### Internal Details #####
  ===============================================================================
- The window is a statically declared buffer of linked nodes making it a double 
+ The window is a statically declared buffer of linked nodes making it a double
  linked list with circular linking.
 
  When a new node/sample is inserted in the list the oldest inserted node is used
- as the instance for the new node. 
+ as the instance for the new node.
  The oldest node is always relocated in the list when inserting a new one.
 
  The window has two main views depending on which type of pointers in a node are
- used to traverse it: 
+ used to traverse it:
  - `nextByAge`: iterates to the next oldest inserted node, itrerating through
                 these pointers is like using a queue (first in first out). The
                 pointer `oldestNode` points to the oldest inserted node in
                 the window a.k.a. the head of a queue
-- `nextByValue`: iterates to the next minimal valued node in the window: 
+- `nextByValue`: iterates to the next minimal valued node in the window:
                  the pointed node will have a greater or equal value.
                  The `minValueNode` always points to the node with smallest
                  value in the window.
@@ -88,28 +88,28 @@
 /* Internal macros -----------------------------------------------------------*/
 
 /**
- * @brief Insert (byValue view) a node between two other nodes
- * @param nodePrev_ptr A pointer to struct MEDFILT_Node that will become the
- *        prev link to newNode
- * @param nodeNext_ptr A pointer to struct MEDFILT_Node that will become the
- *        next link to newNode
- * @param newNode_ptr A pointer to struct MEDFILT_Node that will be inserted
- *        between prevNode and nextNode
+ * @brief Insert (byValue view) a node before a pivot node (selected node)
+ *        keeping linking consistent (its predecessor gets linked to newNode)
+ * @param nodePivot_ptr A pointer to struct MEDFILT_Node that is the pivot node
+ *        newNode will become its prev link
+ * @param newNode_ptr A pointer to struct MEDFILT_Node that will have as next
+ *        link the pivotNode
+ * @note  the node preceding pivotNode will be correctly linked to newNode
  */
-#define __BYVALUE_INSERT_NODE_BETWEEN(nodePrev_ptr, nodeNext_ptr, newNode_ptr) \
-    do {                                                                       \
-        newNode_ptr->prevByValue  = nodePrev_ptr;                              \
-        newNode_ptr->nextByValue  = nodeNext_ptr;                              \
-        nodeNext_ptr->prevByValue = newNode_ptr;                               \
-        nodePrev_ptr->nextByValue = newNode_ptr;                               \
+#define __BYVALUE_INSERT_NODE_BEFORE(nodePivot_ptr, newNode_ptr)              \
+    do {                                                                      \
+        newNode_ptr->prevByValue                = nodePivot_ptr->prevByValue; \
+        newNode_ptr->nextByValue                = nodePivot_ptr;              \
+        nodePivot_ptr->prevByValue->nextByValue = newNode_ptr;                \
+        nodePivot_ptr->prevByValue              = newNode_ptr;                \
     } while (0)
 
 /**
  * @brief Link (byValue view) two nodes so that next/prevByValue pointers link
- *        to each other. 
+ *        to each other.
  * @param nodePrev_ptr A pointer to struct MEDFILT_Node that will be the link
  *        prevByValue to node nodeNext_ptr
- * @param nodeNext_ptr A pointer to struct MEDFILT_Node that will be the link 
+ * @param nodeNext_ptr A pointer to struct MEDFILT_Node that will be the link
  *        next to node nodePrev_ptr
  */
 #define __BYVALUE_LINK_NODES(nodePrev_ptr, nodeNext_ptr) \
@@ -232,7 +232,7 @@ static inline MEDFILT_value_t MEDFILT_Insert(struct MEDFILT_Handle *handle, MEDF
     }
 
     // `it` will point to the future greater neighbour of newValue: insert newNode before `it`
-    __BYVALUE_INSERT_NODE_BETWEEN(it->prevByValue, it, newNode);
+    __BYVALUE_INSERT_NODE_BEFORE(it, newNode);
 
     // update median node
     if (i >= (handle->window_len / 2)) {
