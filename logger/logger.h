@@ -14,7 +14,7 @@
 #include "main.h"
 #include "stmlibs_status.h"
 
-typedef enum { LOGGER_INFO, LOGGER_DEBUG, LOGGER_WARNING, LOGGER_ERROR } LOGGER_MODE;
+typedef enum { LOGGER_INFO, LOGGER_DEBUG, LOGGER_WARNING, LOGGER_ERROR, LOGGER_RAW } LOGGER_MODE;
 
 typedef STMLIBS_StatusTypeDef (*LOGGER_flushTypeDef)(char *buffer, uint32_t size);
 
