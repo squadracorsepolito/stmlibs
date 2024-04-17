@@ -68,9 +68,6 @@ STMLIBS_StatusTypeDef LOGGER_log(LOGGER_HandleTypeDef *handle, LOGGER_MODE mode,
 
     CS_ENTER();
 
-    handle->buffer[handle->index++] = '\r';
-    handle->buffer[handle->index++] = '\n';
-
     char *s = NULL;
 
     switch (mode) {
@@ -90,9 +87,12 @@ STMLIBS_StatusTypeDef LOGGER_log(LOGGER_HandleTypeDef *handle, LOGGER_MODE mode,
             return STMLIBS_ERROR;
     }
 
-    if (mode != LOGGER_RAW)
+    if (mode != LOGGER_RAW) {
+        handle->buffer[handle->index++] = '\r';
+        handle->buffer[handle->index++] = '\n';
         handle->index += snprintf(
             handle->buffer + handle->index, handle->buffer_len - handle->index - 1, "%s[%5ld] ", s, HAL_GetTick());
+    }
 
     va_list args;
     va_start(args, template);
