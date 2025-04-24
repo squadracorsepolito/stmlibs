@@ -43,8 +43,8 @@ FSM_ConfigTypeDef config = {
     .state_table = state_table,
 };
 
-const char* FSM_{{ name | upper }}_to_string(uint32_t state) {
-    if (state < _FSM_{{ name | upper }}_STATE_COUNT)
+const char* FSM_{{ name | upper }}_to_string(FSM_{{ name | upper }}_StateTypeDef state) {
+    if (0 <= state && state < _FSM_{{ name | upper }}_STATE_COUNT)
         return state_name[state];
     
     return "UNKNOWN";
