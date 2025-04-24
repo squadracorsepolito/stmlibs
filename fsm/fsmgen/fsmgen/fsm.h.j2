@@ -29,6 +29,13 @@ typedef enum FSM_{{ name | upper }}_StateEnum FSM_{{ name | upper }}_StateTypeDe
 
 /**
  * @brief
+ * @param state state
+ * @return state name in string form
+ */
+const char* FSM_{{ name | upper }}_to_string(FSM_{{ name | upper }}_StateTypeDef state);
+
+/**
+ * @brief
  * @param handle FSM handle
  * @param event_count number of events
  * @param run_callback callback of a run event

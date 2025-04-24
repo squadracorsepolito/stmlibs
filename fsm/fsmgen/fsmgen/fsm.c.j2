@@ -21,6 +21,12 @@ uint32_t _FSM_{{ name | upper }}_{{ state }}_event_handle(uint8_t event);
 uint32_t _FSM_{{ name | upper }}_{{ state }}_do_work();
 {% endfor %}
 
+static const char* state_name[_FSM_{{ name | upper }}_STATE_COUNT] = {
+{%- for state in states %}
+    [FSM_{{ name | upper }}_{{ state }}] = "{{ state }}",
+{%- endfor %}
+};
+
 FSM_StateTypeDef state_table[_FSM_{{ name | upper }}_STATE_COUNT] = {
 {%- for state in states %}
     [FSM_{{ name | upper }}_{{ state }}] = {
@@ -36,6 +42,13 @@ FSM_ConfigTypeDef config = {
     .state_length = _FSM_{{ name | upper }}_STATE_COUNT,
     .state_table = state_table,
 };
+
+const char* FSM_{{ name | upper }}_to_string(uint32_t state) {
+    if (state < _FSM_{{ name | upper }}_STATE_COUNT)
+        return state_name[state];
+    
+    return "UNKNOWN";
+}
 
 STMLIBS_StatusTypeDef FSM_{{ name | upper }}_init(
     FSM_HandleTypeDef *handle,
