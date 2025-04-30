@@ -92,7 +92,9 @@ STMLIBS_StatusTypeDef _FSM_transition(FSM_HandleTypeDef *handle, uint32_t state)
         handle->config->state_table[handle->current_state].entry();
     }
 
-    handle->transition_callback(state);
+    if(handle->transition_callback != NULL) {
+        handle->transition_callback(state);
+    }
 
     return STMLIBS_OK;
 }
