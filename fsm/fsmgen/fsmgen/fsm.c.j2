@@ -27,7 +27,7 @@ static const char* state_name[_FSM_{{ name | upper }}_STATE_COUNT] = {
 {%- endfor %}
 };
 
-FSM_StateTypeDef state_table[_FSM_{{ name | upper }}_STATE_COUNT] = {
+static FSM_StateTypeDef state_table[_FSM_{{ name | upper }}_STATE_COUNT] = {
 {%- for state in states %}
     [FSM_{{ name | upper }}_{{ state }}] = {
         .event_handler = _FSM_{{ name | upper }}_{{ state }}_event_handle,
@@ -38,7 +38,7 @@ FSM_StateTypeDef state_table[_FSM_{{ name | upper }}_STATE_COUNT] = {
 {%- endfor %}
 };
 
-FSM_ConfigTypeDef config = {
+static FSM_ConfigTypeDef config = {
     .state_length = _FSM_{{ name | upper }}_STATE_COUNT,
     .state_table = state_table,
 };
